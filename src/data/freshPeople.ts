@@ -7,10 +7,10 @@
  * staffing turnaround, pages/About.jsx for the founding year). Keep it in step
  * when that site changes; it is one business describing itself twice.
  *
- * Deliberately NOT carried over: the "500+ staff / 1,200+ events / 1,500+
- * events" figures. That site states them inconsistently across About.jsx and
- * StatsCounter.jsx, and a number worth quoting is worth quoting once. Settle it
- * there first, then bring it here if you want it.
+ * The staff figures were settled in the Fresh People repo (branch
+ * claude/staff-count-correction): 50 is the active roster, 500+ is the number
+ * trained since 2014, many since placed into permanent roles with clients. Both
+ * appear below with those meanings — keep them in step with that site.
  */
 
 export interface FreshPeopleGroup {
@@ -84,8 +84,9 @@ export const FRESH_PEOPLE_GROUPS: FreshPeopleGroup[] = [
 /** Each of these is stated on the Fresh People site. Keep them true in both places. */
 export const FRESH_PEOPLE_FACTS = [
   { value: "2014", label: "Trading Since" },
-  { value: "24–48 hrs", label: "Urgent Staffing Requests" },
-  { value: "Randburg", label: "Johannesburg Base" },
+  { value: "50", label: "Active Staff" },
+  { value: "500+", label: "Trained & Placed" },
+  { value: "24–48 hrs", label: "Urgent Requests" },
 ];
 
 export const FRESH_PEOPLE_COVERAGE =
