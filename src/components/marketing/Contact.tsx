@@ -1,5 +1,5 @@
 import { useId, useState, type FormEvent } from "react";
-import { AtSign, CheckCircle2, Instagram, Map, MapPin } from "lucide-react";
+import { AlertCircle, AtSign, CheckCircle2, Instagram, Loader2, Map, MapPin } from "lucide-react";
 import { useReveal } from "../../hooks/useReveal";
 import { Button } from "../ui/Button";
 import { SectionLabel } from "../ui/SectionLabel";
@@ -32,6 +32,8 @@ const FIELD_CLASS =
 const LABEL_CLASS =
   "mb-2 block font-mono text-[10px] uppercase tracking-[0.1em] text-ink-dim";
 
+type Status = "idle" | "sending" | "sent" | "mailto" | "error";
+
 export function Contact() {
   const ref = useReveal<HTMLDivElement>();
   const fieldId = useId();
@@ -41,10 +43,10 @@ export function Contact() {
   const [occasion, setOccasion] = useState("Corporate Summit");
   const [eventDate, setEventDate] = useState("");
   const [notes, setNotes] = useState("");
-  const [hasSubmitted, setHasSubmitted] = useState(false);
+  const [status, setStatus] = useState<Status>("idle");
+  const [errorMessage, setErrorMessage] = useState("");
 
-  const handleSubmit = (e: FormEvent) => {
-    e.preventDefault();
+  const buildMailto = () => {
     const body = [
       `Name: ${name}`,
       `Email: ${email}`,
@@ -54,13 +56,61 @@ export function Contact() {
       "",
       `Notes: ${notes}`,
     ].join("\n");
-    const mailto = `mailto:events@eventive.co.zw?subject=${encodeURIComponent(
+    return `mailto:events@eventive.co.zw?subject=${encodeURIComponent(
       `Quote Request — ${occasion}`
     )}&body=${encodeURIComponent(body)}`;
-    // The handoff to the mail client is invisible, so confirm it in the page too.
-    setHasSubmitted(true);
-    window.location.href = mailto;
   };
+
+  const handleSubmit = async (e: FormEvent) => {
+    e.preventDefault();
+    setStatus("sending");
+    setErrorMessage("");
+
+    const payload = { name, email, phone, occasion, eventDate, notes };
+
+    try {
+      const response = await fetch("/api/inquiry", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      // A 200 alone is not proof of delivery: static hosts commonly rewrite every
+      // unmatched path to index.html, so only a JSON acknowledgement counts.
+      if (response.ok) {
+        const contentType = response.headers.get("content-type") ?? "";
+        const body = contentType.includes("application/json")
+          ? await response.json().catch(() => null)
+          : null;
+
+        if (body?.status === "received") {
+          setStatus("sent");
+          return;
+        }
+        setStatus("mailto");
+        window.location.href = buildMailto();
+        return;
+      }
+
+      const data = await response.json().catch(() => ({}) as { error?: string });
+
+      // A rejected field is the visitor's to fix; anything else is our problem,
+      // and handing them their mail client beats losing the inquiry.
+      if (response.status === 400 || response.status === 429) {
+        setErrorMessage(data.error ?? "Please check the form and try again.");
+        setStatus("error");
+        return;
+      }
+
+      setStatus("mailto");
+      window.location.href = buildMailto();
+    } catch {
+      setStatus("mailto");
+      window.location.href = buildMailto();
+    }
+  };
+
+  const isSending = status === "sending";
 
   return (
     <section id="contact" className="relative z-[1] py-28">
@@ -105,6 +155,25 @@ export function Contact() {
             </div>
           </div>
 
+          {status === "sent" ? (
+            <div className="glass-strong reveal flex min-h-[420px] flex-col items-center justify-center rounded-hero p-9 text-center">
+              <span className="mb-5 flex h-14 w-14 items-center justify-center rounded-full bg-azure-soft text-azure">
+                <CheckCircle2 aria-hidden="true" className="h-6 w-6" />
+              </span>
+              <h3 className="mb-3 font-serif text-[26px] text-paper">Inquiry received.</h3>
+              <p className="max-w-[340px] text-[14px] text-pretty text-ink">
+                Thank you, {name.split(" ")[0] || "there"}. Our Harare team will come back to you with a
+                detailed logistics quote within one business day.
+              </p>
+              <button
+                type="button"
+                onClick={() => setStatus("idle")}
+                className="mt-7 cursor-pointer font-mono text-[10.5px] uppercase tracking-[0.1em] text-azure transition-colors hover:text-azure-bright"
+              >
+                Send another inquiry
+              </button>
+            </div>
+          ) : (
           <form onSubmit={handleSubmit} className="glass-strong reveal rounded-hero p-9">
             <div className="mb-5">
               <label htmlFor={`${fieldId}-name`} className={LABEL_CLASS}>
@@ -200,28 +269,42 @@ export function Contact() {
               />
             </div>
 
-            <Button type="submit" className="mt-7 w-full">
-              Send Inquiry
+            <Button type="submit" className="mt-7 w-full" disabled={isSending}>
+              {isSending ? (
+                <>
+                  <Loader2 aria-hidden="true" className="h-3.5 w-3.5 animate-spin" />
+                  Sending
+                </>
+              ) : (
+                "Send Inquiry"
+              )}
             </Button>
 
             <p
               role="status"
               aria-live="polite"
               className={cn(
-                "mt-4 flex items-center justify-center gap-2 text-center font-mono text-[10.5px] uppercase tracking-[0.08em] transition-opacity duration-300",
-                hasSubmitted ? "text-azure opacity-100" : "text-ink-dim opacity-70"
+                "mt-4 flex items-center justify-center gap-2 text-center font-mono text-[10.5px] uppercase tracking-[0.08em]",
+                status === "error" ? "text-clay-bright" : "text-ink-dim"
               )}
             >
-              {hasSubmitted ? (
+              {status === "error" && (
                 <>
-                  <CheckCircle2 aria-hidden="true" className="h-3.5 w-3.5" />
-                  Your mail client should now be open — press send and we&apos;ll reply within a day.
+                  <AlertCircle aria-hidden="true" className="h-3.5 w-3.5 shrink-0" />
+                  {errorMessage}
                 </>
-              ) : (
-                "Opens in your mail app · replies within one business day"
               )}
+              {status === "mailto" && (
+                <>
+                  <CheckCircle2 aria-hidden="true" className="h-3.5 w-3.5 shrink-0 text-azure" />
+                  Opening your mail app — press send there and we&apos;ll reply within a day.
+                </>
+              )}
+              {(status === "idle" || status === "sending") &&
+                "Replies within one business day · Harare team"}
             </p>
           </form>
+          )}
         </div>
       </div>
     </section>

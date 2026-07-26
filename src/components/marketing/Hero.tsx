@@ -1,5 +1,6 @@
 import { useReveal } from "../../hooks/useReveal";
 import { Button } from "../ui/Button";
+import { CoverImage } from "../ui/CoverImage";
 import { SectionLabel } from "../ui/SectionLabel";
 
 const STATS = [
@@ -51,47 +52,45 @@ export function Hero() {
             </div>
           </div>
 
-          <div className="reveal relative">
-            <div className="glass relative overflow-hidden rounded-hero p-10">
-              <div
-                className="absolute inset-0 bg-cover bg-center opacity-[0.12]"
-                style={{
-                  backgroundImage:
-                    "url('https://images.unsplash.com/photo-1519167758481-83f550bb49b3?auto=format&fit=crop&q=60&w=900')",
-                }}
-              />
-              {/* Warms the lower half of the card so the list sits on a gradient, not flat glass */}
-              <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-clay-soft/40 to-transparent" />
+          {/* Photograph leads, with the capability sheet frosted over its lower third */}
+          <div className="reveal relative min-h-[560px] overflow-hidden rounded-hero bg-canvas-deep shadow-[0_20px_60px_rgba(16,23,34,0.18)]">
+            <CoverImage
+              src="https://images.unsplash.com/photo-1519167758481-83f550bb49b3?auto=format&fit=crop&q=80&w=1000"
+              alt="An Eventive marquee build at dusk"
+            />
+            <div
+              aria-hidden="true"
+              className="absolute inset-0 bg-gradient-to-t from-paper/55 via-transparent to-paper/25"
+            />
 
-              <div className="relative z-[1]">
-                <div className="float-slow relative mx-auto mb-6 flex h-28 w-28 items-center justify-center rounded-full border-[1.5px] border-azure">
-                  <div className="absolute inset-1.5 rounded-full border border-azure opacity-40" />
-                  <span className="text-center font-serif text-[15px] italic leading-[1.15] text-azure">
-                    EST.
-                    <br />
-                    HARARE
-                  </span>
-                </div>
-                <h2 className="mb-1.5 text-center font-serif text-[26px] text-paper">Eventive</h2>
-                <div className="mb-7 text-center font-mono text-[10px] uppercase tracking-[0.14em] text-clay-bright">
-                  Zimbabwe · Nationwide Logistics
-                </div>
-                <ul className="flex flex-col gap-4">
-                  {CAPABILITIES.map(([label, value], idx) => (
-                    <li
-                      key={label}
-                      className={`flex gap-3 pt-4 text-[13px] text-ink ${
-                        idx > 0 ? "border-t border-line-soft" : ""
-                      }`}
-                    >
-                      <strong className="inline-block min-w-[92px] font-semibold text-paper">
-                        {label}
-                      </strong>
-                      {value}
-                    </li>
-                  ))}
-                </ul>
+            <div className="float-slow absolute left-1/2 top-9 flex h-24 w-24 -translate-x-1/2 items-center justify-center rounded-full border-[1.5px] border-white/70 bg-white/15 backdrop-blur-sm">
+              <div className="absolute inset-1.5 rounded-full border border-white/50" />
+              <span className="text-center font-serif text-[14px] italic leading-[1.15] text-white">
+                EST.
+                <br />
+                HARARE
+              </span>
+            </div>
+
+            <div className="glass-photo absolute inset-x-3 bottom-3 rounded-panel px-7 py-6">
+              <div className="mb-4 font-mono text-[10px] uppercase tracking-[0.14em] text-clay-bright">
+                Zimbabwe · Nationwide Logistics
               </div>
+              <ul className="flex flex-col gap-3">
+                {CAPABILITIES.map(([label, value], idx) => (
+                  <li
+                    key={label}
+                    className={`flex gap-3 text-[12.5px] text-ink ${
+                      idx > 0 ? "border-t border-line-soft pt-3" : ""
+                    }`}
+                  >
+                    <strong className="inline-block min-w-[86px] shrink-0 font-semibold text-paper">
+                      {label}
+                    </strong>
+                    {value}
+                  </li>
+                ))}
+              </ul>
             </div>
           </div>
         </div>

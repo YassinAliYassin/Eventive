@@ -4,12 +4,15 @@ import { Button } from "../ui/Button";
 import { useActiveSection } from "../../hooks/useActiveSection";
 import { cn } from "../../lib/cn";
 
+// "Contact" is deliberately absent — the Request a Quote button is that link,
+// and repeating it would cost a nav slot the new sections need.
 const NAV_LINKS = [
   { href: "#about", label: "About" },
   { href: "#services", label: "Services" },
+  { href: "#work", label: "Work" },
   { href: "#manifest", label: "Logistics" },
   { href: "#venues", label: "Venues" },
-  { href: "#contact", label: "Contact" },
+  { href: "#faq", label: "FAQ" },
 ];
 
 const SECTION_IDS = NAV_LINKS.map((link) => link.href.slice(1));

@@ -1,35 +1,17 @@
-import { useState } from "react";
 import { MapPin, Users } from "lucide-react";
 import { VENUES, type Venue } from "../../data/venues";
 import { useReveal } from "../../hooks/useReveal";
+import { CoverImage } from "../ui/CoverImage";
 import { SectionLabel } from "../ui/SectionLabel";
-import { cn } from "../../lib/cn";
 
 function VenueCard({ venue }: { venue: Venue }) {
-  const [status, setStatus] = useState<"loading" | "loaded" | "failed">("loading");
-
   return (
     <article className="glass lift reveal group relative h-[400px] overflow-hidden rounded-panel p-0 shadow-[0_12px_40px_rgba(16,23,34,0.14)] sm:h-[420px]">
-      {/* Stands in while the photo loads, and stays put if the host is unreachable */}
-      <div
-        aria-hidden="true"
-        className="absolute inset-0 bg-gradient-to-br from-azure/25 via-canvas-deep to-clay/20"
+      <CoverImage
+        src={venue.image}
+        alt={`${venue.name}, ${venue.location}`}
+        className="transition-transform duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.06]"
       />
-
-      {status !== "failed" && (
-        <img
-          src={venue.image}
-          alt={`${venue.name}, ${venue.location}`}
-          loading="lazy"
-          decoding="async"
-          onLoad={() => setStatus("loaded")}
-          onError={() => setStatus("failed")}
-          className={cn(
-            "absolute inset-0 h-full w-full object-cover transition-[opacity,transform] duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.06]",
-            status === "loaded" ? "opacity-100" : "opacity-0"
-          )}
-        />
-      )}
 
       {/* Keeps the top chip legible over bright skies */}
       <div

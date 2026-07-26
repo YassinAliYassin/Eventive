@@ -3,8 +3,10 @@ import { ArrowUp } from "lucide-react";
 const FOOTER_LINKS = [
   { href: "#about", label: "About" },
   { href: "#services", label: "Services" },
+  { href: "#work", label: "Work" },
   { href: "#manifest", label: "Logistics" },
   { href: "#venues", label: "Venues" },
+  { href: "#faq", label: "FAQ" },
   { href: "#contact", label: "Contact" },
 ];
 
