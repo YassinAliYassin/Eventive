@@ -12,7 +12,7 @@ the quote-inquiry endpoint.
 ```bash
 npm install
 npm run dev        # Express on :3000, serving ./dist when it exists
-npm run build      # Vite build + bundle the server to dist/server.cjs
+npm run build      # Vite build + bundle the server to dist/server.mjs
 npm start          # run the bundled server
 ```
 

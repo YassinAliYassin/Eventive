@@ -1,0 +1,92 @@
+# Verifies the site actually compiles and builds. Until this existed the only
+# workflow was the Datadog one, which runs Synthetic tests against a deployed
+# environment — nothing checked whether the code on a pull request was valid.
+
+name: CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+# A new push to a PR makes the in-flight run obsolete; don't burn minutes on it.
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    name: Type-check, lint, build
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci --no-audit --no-fund
+
+      - name: Type-check
+        run: npm run type-check
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Build
+        run: npm run build
+
+      # Catches the class of failure where the build "succeeds" but emits nothing,
+      # which would otherwise only surface at deploy time.
+      - name: Verify build output
+        run: |
+          test -f dist/index.html || { echo "::error::dist/index.html missing after build"; exit 1; }
+          test -f dist/server.mjs || { echo "::error::dist/server.mjs missing after build"; exit 1; }
+          echo "Build output:"
+          ls -la dist
+
+      # The server must survive being started, not merely bundled.
+      - name: Smoke-test the built server
+        run: |
+          node dist/server.mjs &
+          SERVER_PID=$!
+          trap 'kill $SERVER_PID 2>/dev/null || true' EXIT
+
+          for attempt in $(seq 1 20); do
+            if curl -sf http://localhost:3000/api/health > /dev/null; then
+              echo "Server responded after ${attempt} attempt(s)."
+              break
+            fi
+            if [ "$attempt" -eq 20 ]; then
+              echo "::error::Server did not respond on /api/health within 20s"
+              exit 1
+            fi
+            sleep 1
+          done
+
+          echo "Health:"
+          curl -s http://localhost:3000/api/health
+
+          # With no delivery configured this must be 503, so the browser falls
+          # back to mailto rather than reporting a lost inquiry as sent.
+          STATUS=$(curl -s -o /dev/null -w '%{http_code}' \
+            -X POST http://localhost:3000/api/inquiry \
+            -H 'Content-Type: application/json' \
+            -d '{"name":"CI Smoke","email":"ci@example.com","occasion":"Wedding"}')
+          echo "POST /api/inquiry -> $STATUS"
+          [ "$STATUS" = "503" ] || { echo "::error::Expected 503 without delivery configured, got $STATUS"; exit 1; }
+
+          # Malformed input must be rejected, not accepted and dropped.
+          STATUS=$(curl -s -o /dev/null -w '%{http_code}' \
+            -X POST http://localhost:3000/api/inquiry \
+            -H 'Content-Type: application/json' \
+            -d '{"name":"x","email":"not-an-email"}')
+          echo "POST /api/inquiry (invalid) -> $STATUS"
+          [ "$STATUS" = "400" ] || { echo "::error::Expected 400 for invalid input, got $STATUS"; exit 1; }
