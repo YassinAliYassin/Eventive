@@ -5,6 +5,7 @@ import { Services } from "./components/marketing/Services";
 import { Manifest } from "./components/marketing/Manifest";
 import { Work } from "./components/marketing/Work";
 import { Venues } from "./components/marketing/Venues";
+import { FreshPeople } from "./components/marketing/FreshPeople";
 import { Faq } from "./components/marketing/Faq";
 import { Contact } from "./components/marketing/Contact";
 import { Footer } from "./components/marketing/Footer";
@@ -27,6 +28,7 @@ export default function App() {
         <Work />
         <Manifest />
         <Venues />
+        <FreshPeople />
         <Faq />
         <Contact />
       </main>

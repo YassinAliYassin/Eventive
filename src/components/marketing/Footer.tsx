@@ -6,6 +6,7 @@ const FOOTER_LINKS = [
   { href: "#work", label: "Work" },
   { href: "#manifest", label: "Logistics" },
   { href: "#venues", label: "Venues" },
+  { href: "#fresh-people", label: "South Africa" },
   { href: "#faq", label: "FAQ" },
   { href: "#contact", label: "Contact" },
 ];
@@ -66,7 +67,12 @@ export function Footer() {
           <div>
             <div className={COLUMN_HEADING}>South Africa</div>
             <div className="flex flex-col gap-2">
-              <span className="font-serif text-[17px] italic text-paper">We Are Fresh People</span>
+              <a
+                href="#fresh-people"
+                className="w-fit font-serif text-[17px] italic text-paper transition-colors hover:text-azure"
+              >
+                We Are Fresh People
+              </a>
               <a
                 href="https://fresh-people.co.za"
                 target="_blank"
