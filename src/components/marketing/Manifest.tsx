@@ -31,7 +31,7 @@ export function Manifest() {
           </h2>
           <p className="reveal text-[15px] text-pretty text-ink">
             Every Eventive deployment runs on a timed manifest — from marquee assembly two days out, to
-            the last dance. Below is a real run-of-show from three of our most requested formats.
+            the last dance. Below is the manifest structure we build to, for three of the formats we run.
           </p>
         </div>
 
@@ -80,7 +80,7 @@ export function Manifest() {
             <span className="text-paper-dim">{active.title}</span>
             <span className="inline-flex items-center gap-1.5 rounded-full bg-azure-soft px-3 py-1.5 tracking-[0.14em] text-azure">
               <CheckCircle2 aria-hidden="true" className="h-3 w-3" />
-              Confirmed
+              Sample
             </span>
           </div>
 

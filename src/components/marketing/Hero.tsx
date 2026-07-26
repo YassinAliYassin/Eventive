@@ -3,9 +3,14 @@ import { Button } from "../ui/Button";
 import { CoverImage } from "../ui/CoverImage";
 import { SectionLabel } from "../ui/SectionLabel";
 
+/*
+ * These describe capability, not history. Eventive is being set up — it has no
+ * track record yet, so nothing here may imply completed events. "Largest single
+ * deployment" and "cities serviced" were exactly that kind of claim.
+ */
 const STATS = [
-  { value: "5", label: "Cities Serviced Nationwide" },
-  { value: "1,500", label: "Guests, Largest Single Deployment" },
+  { value: "5", label: "Cities On Our Coverage Map" },
+  { value: "1,500", label: "Guests, Peak Rig Capacity" },
   { value: "100%", label: "Owned Inventory, No Sub-Hires" },
 ];
 

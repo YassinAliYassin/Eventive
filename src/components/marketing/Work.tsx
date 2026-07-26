@@ -26,20 +26,21 @@ export function Work() {
     image: item.image,
     title: item.title,
     caption: item.scope,
-    meta: `${item.venue} · ${item.guests}`,
+    meta: `${item.suitedTo} · ${item.capacity}`,
   }));
 
   return (
     <section id="work" className="relative z-[1] py-28">
       <div ref={ref} className="mx-auto max-w-[1180px] px-7">
         <div className="mb-10 max-w-[760px]">
-          <SectionLabel className="reveal mb-5">Selected Builds</SectionLabel>
+          <SectionLabel className="reveal mb-5">Build Formats</SectionLabel>
           <h2 className="reveal mb-5 text-section font-medium text-balance font-serif text-paper">
-            The work, not the brochure.
+            What we are set up to build.
           </h2>
           <p className="reveal text-[15px] text-pretty text-ink">
-            Structures raised, rigs flown, and crews deployed across the country. Filter by the kind of
-            gathering you are planning to see how the same inventory gets configured.
+            Each format below is a configuration of inventory we own, specified for a kind of venue and a
+            guest count. Filter by the gathering you are planning to see how the same kit reconfigures
+            around it.
           </p>
         </div>
 
@@ -74,12 +75,12 @@ export function Work() {
               key={item.id}
               type="button"
               onClick={() => setOpenIndex(index)}
-              aria-label={`View ${item.title} at ${item.venue}`}
+              aria-label={`View the ${item.title} format, suited to ${item.suitedTo}`}
               className="group lift reveal relative aspect-[4/3] cursor-pointer overflow-hidden rounded-panel bg-canvas-deep text-left shadow-[0_12px_40px_rgba(16,23,34,0.14)]"
             >
               <CoverImage
                 src={item.image}
-                alt={`${item.title} — ${item.venue}`}
+                alt={`${item.title} — a build format suited to ${item.suitedTo}`}
                 className="transition-transform duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.07]"
               />
 
@@ -102,7 +103,7 @@ export function Work() {
                   {item.title}
                 </h3>
                 <div className="mt-1.5 font-mono text-[10px] uppercase tracking-[0.1em] text-white/80">
-                  {item.venue} · {item.guests}
+                  {item.suitedTo} · {item.capacity}
                 </div>
                 {/* Held at zero height until hover so the card stays quiet at rest */}
                 <div className="grid grid-rows-[0fr] transition-[grid-template-rows] duration-400 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:grid-rows-[1fr] group-focus-visible:grid-rows-[1fr]">

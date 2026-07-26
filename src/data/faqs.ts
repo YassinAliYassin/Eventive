@@ -21,7 +21,7 @@ export const FAQS: Faq[] = [
     id: "coverage",
     question: "Where in Zimbabwe do you operate?",
     answer:
-      "We run nationwide from our Harare logistics hub, with established transport and rigging routes to Bulawayo, Victoria Falls, Nyanga, and Selous. We also build at private estates, homesteads, and courtyards that aren't on any venue list — if a truck can reach it, we can stage it.",
+      "We operate nationwide from our Harare logistics hub, with transport and rigging routes planned to Bulawayo, Victoria Falls, Nyanga, and Selous. We also build at private estates, homesteads, and courtyards that aren't on any venue list — if a truck can reach it, we can stage it.",
   },
   {
     id: "sub-hires",
@@ -39,7 +39,7 @@ export const FAQS: Faq[] = [
     id: "capacity",
     question: "How large an event can you handle?",
     answer:
-      "Our sound and staging are specified for 100 to 1,500 guests, and our largest single deployment to date was 1,500. Smaller private gatherings run on the same crew standard — the manifest scales down, the discipline doesn't.",
+      "Our sound and staging are specified for 100 to 1,500 guests. Smaller private gatherings run to the same crew standard — the manifest scales down, the discipline doesn't.",
   },
   {
     id: "roora",

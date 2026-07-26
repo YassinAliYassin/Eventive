@@ -90,18 +90,3 @@ jobs:
             -d '{"name":"x","email":"not-an-email"}')
           echo "POST /api/inquiry (invalid) -> $STATUS"
           [ "$STATUS" = "400" ] || { echo "::error::Expected 400 for invalid input, got $STATUS"; exit 1; }
-
-          # Same contract for the planner: 503 without a key, never a fake draft.
-          STATUS=$(curl -s -o /dev/null -w '%{http_code}' \
-            -X POST http://localhost:3000/api/plan \
-            -H 'Content-Type: application/json' \
-            -d '{"occasion":"Wedding","guests":"400","location":"Harare"}')
-          echo "POST /api/plan -> $STATUS"
-          [ "$STATUS" = "503" ] || { echo "::error::Expected 503 without GEMINI_API_KEY, got $STATUS"; exit 1; }
-
-          STATUS=$(curl -s -o /dev/null -w '%{http_code}' \
-            -X POST http://localhost:3000/api/plan \
-            -H 'Content-Type: application/json' \
-            -d '{"occasion":"","guests":"not-a-number"}')
-          echo "POST /api/plan (invalid) -> $STATUS"
-          [ "$STATUS" = "400" ] || { echo "::error::Expected 400 for invalid planner input, got $STATUS"; exit 1; }

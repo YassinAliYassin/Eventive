@@ -55,7 +55,7 @@ export function Venues() {
             Venues on the manifest.
           </h2>
           <p className="reveal text-[15px] text-pretty text-ink">
-            Our transport and rigging crews are calibrated to these routes — or bring the full Eventive
+            Our transport and rigging are planned around these routes — or bring the full Eventive
             build to your own private estate, homestead, or courtyard.
           </p>
         </div>

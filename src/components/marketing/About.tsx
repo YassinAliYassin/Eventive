@@ -41,22 +41,21 @@ export function About() {
       <div ref={ref} className="mx-auto max-w-[1180px] px-7">
         <div className="mb-20 grid grid-cols-1 items-start gap-14 lg:grid-cols-[1.15fr_0.85fr]">
           <div className="reveal">
-            <SectionLabel className="mb-5">Our Corporate Legacy</SectionLabel>
+            <SectionLabel className="mb-5">Why We Are Building This</SectionLabel>
             <h2 className="mb-6 text-section font-medium text-balance font-serif text-paper">
-              Zimbabwe&apos;s premier full-service events management &amp; mobile hospitality agency
+              A full-service events management &amp; mobile hospitality company, built for Zimbabwe
             </h2>
             <p className="mb-4 text-[15px] text-pretty text-ink">
-              Founded to redefine the structural and hospitality landscape of high-profile gatherings in
-              Southern Africa, <strong className="font-semibold text-azure">Eventive</strong> delivers
-              turn-key execution for corporate summits, state galas, majestic weddings, and intimate
-              private celebrations.
+              <strong className="font-semibold text-azure">Eventive</strong> is being established to
+              bring turn-key execution to high-profile gatherings in Southern Africa — corporate summits,
+              state galas, weddings, and intimate private celebrations — with the structure and
+              hospitality handled by one accountable team.
             </p>
             <p className="text-[15px] text-pretty text-ink">
-              Operating from our primary{" "}
-              <strong className="font-semibold text-azure">Logistics Hub in Harare</strong>, we run a
-              sophisticated network servicing Harare, Bulawayo, Victoria Falls, Nyanga, and Selous — with
-              elite inventory ranging from custom modular bar structures to linear-array concert audio and
-              luxury glass marquees.
+              We work from a{" "}
+              <strong className="font-semibold text-azure">logistics hub in Harare</strong>, with routes
+              covering Bulawayo, Victoria Falls, Nyanga, and Selous — and inventory ranging from custom
+              modular bar structures to line-array concert audio and glass marquees, all of it ours.
             </p>
           </div>
 
@@ -67,8 +66,8 @@ export function About() {
             <h3 className="my-2.5 font-serif text-[26px] text-azure">Eventive Zimbabwe</h3>
             <span aria-hidden="true" className="mx-auto mb-4 block h-px w-10 bg-clay/40" />
             <p className="text-[13px] text-pretty text-ink">
-              Seamlessly fusing traditional Southern African hospitality with elite, state-of-the-art
-              global production standards — one logistics chain, start to finish.
+              Traditional Southern African hospitality, run to international production standards — one
+              logistics chain, start to finish.
             </p>
           </div>
         </div>
