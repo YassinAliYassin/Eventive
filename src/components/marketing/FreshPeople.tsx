@@ -1,4 +1,4 @@
-import { ClipboardCheck, GlassWater, Users } from "lucide-react";
+import { ArrowUpRight, ClipboardCheck, GlassWater, Settings2, Users } from "lucide-react";
 import {
   FRESH_PEOPLE_COVERAGE,
   FRESH_PEOPLE_FACTS,
@@ -10,8 +10,9 @@ import { Button } from "../ui/Button";
 import { SectionLabel } from "../ui/SectionLabel";
 
 const GROUP_ICONS = {
-  talent: Users,
-  support: GlassWater,
+  staffing: Users,
+  equipment: GlassWater,
+  logistics: Settings2,
   management: ClipboardCheck,
 } as const;
 
@@ -28,24 +29,36 @@ export function FreshPeople() {
           </h2>
           <p className="reveal text-[15px] text-pretty text-ink">
             One business, two countries. In Zimbabwe we trade as Eventive; in South Africa as{" "}
-            <strong className="font-semibold text-azure">Fresh People</strong>, working out of
-            Johannesburg across Gauteng — talent, event support, and management. An event that
-            crosses the border does not change hands.
+            <strong className="font-semibold text-azure">Fresh People</strong>, supplying the people,
+            hospitality support, equipment, setup crews, and coordination that run polished events
+            across Johannesburg and Gauteng. An event that crosses the border does not change hands.
           </p>
         </div>
 
-        <div className="grid grid-cols-1 gap-5 md:grid-cols-3">
+        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
           {FRESH_PEOPLE_GROUPS.map((group) => {
             const Icon = GROUP_ICONS[group.id as keyof typeof GROUP_ICONS] ?? Users;
             return (
-              <div key={group.id} className="glass lift reveal flex flex-col rounded-panel p-8">
-                <span className="mb-5 flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-azure-soft text-azure">
-                  <Icon aria-hidden="true" className="h-[18px] w-[18px]" />
-                </span>
-                <h3 className="mb-2.5 font-serif text-[24px] text-balance text-paper">
+              <a
+                key={group.id}
+                href={group.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="glass lift reveal group/card flex flex-col rounded-panel p-7"
+              >
+                <div className="mb-5 flex items-start justify-between gap-3">
+                  <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-azure-soft text-azure">
+                    <Icon aria-hidden="true" className="h-[18px] w-[18px]" />
+                  </span>
+                  <ArrowUpRight
+                    aria-hidden="true"
+                    className="h-4 w-4 text-ink-dim opacity-0 transition-all duration-300 group-hover/card:translate-x-0.5 group-hover/card:-translate-y-0.5 group-hover/card:opacity-100"
+                  />
+                </div>
+                <h3 className="mb-2.5 font-serif text-[22px] text-balance text-paper">
                   {group.title}
                 </h3>
-                <p className="mb-6 text-[13.5px] text-pretty text-ink">{group.blurb}</p>
+                <p className="mb-6 text-[13px] text-pretty text-ink">{group.blurb}</p>
                 <ul className="flex flex-col gap-3 border-t border-line-soft pt-6">
                   {group.items.map((item) => (
                     <li key={item} className="relative pl-4 text-[12.5px] text-pretty text-ink">
@@ -57,7 +70,7 @@ export function FreshPeople() {
                     </li>
                   ))}
                 </ul>
-              </div>
+              </a>
             );
           })}
         </div>
