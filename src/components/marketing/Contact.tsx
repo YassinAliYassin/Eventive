@@ -1,90 +1,120 @@
-import { FormEvent, useState } from "react";
+import { useId, useState, type FormEvent } from "react";
+import { AtSign, CheckCircle2, Instagram, Map, MapPin } from "lucide-react";
 import { useReveal } from "../../hooks/useReveal";
+import { Button } from "../ui/Button";
+import { SectionLabel } from "../ui/SectionLabel";
+import { cn } from "../../lib/cn";
 
 const CONTACT_LINES = [
-  { key: "Hub", value: "Harare, Zimbabwe" },
-  { key: "Email", value: "events@eventive.co.zw", href: "mailto:events@eventive.co.zw" },
-  { key: "Instagram", value: "@eventive.co.zw", href: "https://instagram.com/eventive.co.zw" },
-  { key: "Coverage", value: "Harare · Bulawayo · Victoria Falls · Nyanga · Selous" },
+  { key: "Hub", icon: MapPin, value: "Harare, Zimbabwe" },
+  {
+    key: "Email",
+    icon: AtSign,
+    value: "events@eventive.co.zw",
+    href: "mailto:events@eventive.co.zw",
+  },
+  {
+    key: "Instagram",
+    icon: Instagram,
+    value: "@eventive.co.zw",
+    href: "https://instagram.com/eventive.co.zw",
+  },
+  {
+    key: "Coverage",
+    icon: Map,
+    value: "Harare · Bulawayo · Victoria Falls · Nyanga · Selous",
+  },
 ];
 
 const FIELD_CLASS =
-  "w-full bg-white/70 border border-line rounded-2xl px-4 py-3 text-paper text-[13.5px] placeholder:text-ink-dim/70 focus:outline-none focus:border-azure focus:ring-2 focus:ring-azure/20 transition-all";
+  "w-full rounded-field border border-line bg-white/70 px-4 py-3 text-[13.5px] text-paper transition-all placeholder:text-ink-dim/70 focus:border-azure focus:outline-none focus:ring-2 focus:ring-azure/20";
+
+const LABEL_CLASS =
+  "mb-2 block font-mono text-[10px] uppercase tracking-[0.1em] text-ink-dim";
 
 export function Contact() {
   const ref = useReveal<HTMLDivElement>();
+  const fieldId = useId();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [occasion, setOccasion] = useState("Corporate Summit");
   const [eventDate, setEventDate] = useState("");
   const [notes, setNotes] = useState("");
+  const [hasSubmitted, setHasSubmitted] = useState(false);
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
     const body = [
       `Name: ${name}`,
+      `Email: ${email}`,
       `Phone: ${phone}`,
       `Occasion: ${occasion}`,
       `Event Date: ${eventDate}`,
+      "",
       `Notes: ${notes}`,
     ].join("\n");
     const mailto = `mailto:events@eventive.co.zw?subject=${encodeURIComponent(
       `Quote Request — ${occasion}`
     )}&body=${encodeURIComponent(body)}`;
+    // The handoff to the mail client is invisible, so confirm it in the page too.
+    setHasSubmitted(true);
     window.location.href = mailto;
   };
 
   return (
-    <section id="contact" className="py-28">
-      <div ref={ref} className="max-w-[1180px] mx-auto px-7">
-        <div className="reveal grid grid-cols-1 lg:grid-cols-2 gap-14 items-start">
-          <div>
-            <div className="font-mono text-[11px] tracking-[0.18em] uppercase text-brass-bright inline-flex items-center gap-2.5 mb-5">
-              <span className="w-[18px] h-px bg-brass-bright inline-block" />
-              Open a Manifest
-            </div>
-            <h2 className="font-serif font-medium text-paper text-[34px] md:text-[42px] mb-5">
+    <section id="contact" className="relative z-[1] py-28">
+      <div ref={ref} className="mx-auto max-w-[1180px] px-7">
+        <div className="grid grid-cols-1 items-start gap-14 lg:grid-cols-2">
+          <div className="reveal">
+            <SectionLabel className="mb-5">Open a Manifest</SectionLabel>
+            <h2 className="mb-5 text-section font-medium text-balance font-serif text-paper">
               Let&apos;s plan your event.
             </h2>
-            <p className="text-[15px] text-ink max-w-[440px] mb-8">
+            <p className="mb-8 max-w-[440px] text-[15px] text-pretty text-ink">
               Tell us the date, the guest count, and the occasion — our Harare team will respond with a
               detailed logistics quote within one business day.
             </p>
-            <div className="glass rounded-[28px] p-8 flex flex-col gap-5">
-              {CONTACT_LINES.map((line) => (
-                <div
-                  key={line.key}
-                  className="flex flex-col sm:flex-row gap-1 sm:gap-4 sm:items-baseline text-sm"
-                >
-                  <span className="font-mono text-[10px] tracking-[0.1em] uppercase text-ink-dim sm:min-w-[90px] sm:shrink-0">
-                    {line.key}
-                  </span>
-                  {line.href ? (
-                    <a
-                      href={line.href}
-                      target={line.href.startsWith("http") ? "_blank" : undefined}
-                      rel={line.href.startsWith("http") ? "noopener noreferrer" : undefined}
-                      className="text-azure hover:text-azure-bright transition-colors font-medium min-w-0 break-words"
-                    >
-                      {line.value}
-                    </a>
-                  ) : (
-                    <span className="text-paper-dim min-w-0 break-words">{line.value}</span>
-                  )}
-                </div>
-              ))}
+            <div className="glass flex flex-col gap-5 rounded-panel p-8">
+              {CONTACT_LINES.map((line) => {
+                const Icon = line.icon;
+                return (
+                  <div
+                    key={line.key}
+                    className="flex flex-col gap-1 text-sm sm:flex-row sm:items-baseline sm:gap-4"
+                  >
+                    <span className="inline-flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.1em] text-ink-dim sm:min-w-[104px] sm:shrink-0">
+                      <Icon aria-hidden="true" className="h-3.5 w-3.5 text-clay" />
+                      {line.key}
+                    </span>
+                    {line.href ? (
+                      <a
+                        href={line.href}
+                        target={line.href.startsWith("http") ? "_blank" : undefined}
+                        rel={line.href.startsWith("http") ? "noopener noreferrer" : undefined}
+                        className="min-w-0 break-words font-medium text-azure transition-colors hover:text-azure-bright"
+                      >
+                        {line.value}
+                      </a>
+                    ) : (
+                      <span className="min-w-0 break-words text-paper-dim">{line.value}</span>
+                    )}
+                  </div>
+                );
+              })}
             </div>
           </div>
 
-          <form onSubmit={handleSubmit} className="glass-strong rounded-[32px] p-9">
+          <form onSubmit={handleSubmit} className="glass-strong reveal rounded-hero p-9">
             <div className="mb-5">
-              <label className="block font-mono text-[10px] tracking-[0.1em] uppercase text-ink-dim mb-2">
+              <label htmlFor={`${fieldId}-name`} className={LABEL_CLASS}>
                 Full Name
               </label>
               <input
+                id={`${fieldId}-name`}
                 type="text"
                 required
+                autoComplete="name"
                 placeholder="Tinashe Moyo"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
@@ -92,14 +122,16 @@ export function Contact() {
               />
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 mb-5">
+            <div className="mb-5 grid grid-cols-1 gap-5 sm:grid-cols-2">
               <div>
-                <label className="block font-mono text-[10px] tracking-[0.1em] uppercase text-ink-dim mb-2">
+                <label htmlFor={`${fieldId}-email`} className={LABEL_CLASS}>
                   Email
                 </label>
                 <input
+                  id={`${fieldId}-email`}
                   type="email"
                   required
+                  autoComplete="email"
                   placeholder="you@email.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
@@ -107,11 +139,13 @@ export function Contact() {
                 />
               </div>
               <div>
-                <label className="block font-mono text-[10px] tracking-[0.1em] uppercase text-ink-dim mb-2">
+                <label htmlFor={`${fieldId}-phone`} className={LABEL_CLASS}>
                   Phone
                 </label>
                 <input
+                  id={`${fieldId}-phone`}
                   type="tel"
+                  autoComplete="tel"
                   placeholder="+263 77 000 0000"
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
@@ -120,15 +154,16 @@ export function Contact() {
               </div>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 mb-5">
+            <div className="mb-5 grid grid-cols-1 gap-5 sm:grid-cols-2">
               <div>
-                <label className="block font-mono text-[10px] tracking-[0.1em] uppercase text-ink-dim mb-2">
+                <label htmlFor={`${fieldId}-occasion`} className={LABEL_CLASS}>
                   Occasion
                 </label>
                 <select
+                  id={`${fieldId}-occasion`}
                   value={occasion}
                   onChange={(e) => setOccasion(e.target.value)}
-                  className={`${FIELD_CLASS} cursor-pointer`}
+                  className={cn(FIELD_CLASS, "select-field cursor-pointer")}
                 >
                   <option>Corporate Summit</option>
                   <option>Wedding</option>
@@ -138,39 +173,54 @@ export function Contact() {
                 </select>
               </div>
               <div>
-                <label className="block font-mono text-[10px] tracking-[0.1em] uppercase text-ink-dim mb-2">
+                <label htmlFor={`${fieldId}-date`} className={LABEL_CLASS}>
                   Event Date
                 </label>
                 <input
+                  id={`${fieldId}-date`}
                   type="date"
                   value={eventDate}
                   onChange={(e) => setEventDate(e.target.value)}
-                  className={`${FIELD_CLASS} cursor-pointer`}
+                  className={cn(FIELD_CLASS, "cursor-pointer")}
                 />
               </div>
             </div>
 
             <div>
-              <label className="block font-mono text-[10px] tracking-[0.1em] uppercase text-ink-dim mb-2">
+              <label htmlFor={`${fieldId}-notes`} className={LABEL_CLASS}>
                 Notes
               </label>
               <textarea
+                id={`${fieldId}-notes`}
                 placeholder="Guest count, venue, and anything else we should know."
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
                 rows={4}
-                className={`${FIELD_CLASS} resize-y min-h-[100px]`}
+                className={cn(FIELD_CLASS, "min-h-[100px] resize-y")}
               />
             </div>
 
-            <div className="mt-7">
-              <button
-                type="submit"
-                className="w-full font-mono text-xs tracking-[0.08em] uppercase bg-azure text-white py-4 rounded-full border-none cursor-pointer hover:bg-azure-bright transition-colors shadow-md shadow-azure/20"
-              >
-                Send Inquiry
-              </button>
-            </div>
+            <Button type="submit" className="mt-7 w-full">
+              Send Inquiry
+            </Button>
+
+            <p
+              role="status"
+              aria-live="polite"
+              className={cn(
+                "mt-4 flex items-center justify-center gap-2 text-center font-mono text-[10.5px] uppercase tracking-[0.08em] transition-opacity duration-300",
+                hasSubmitted ? "text-azure opacity-100" : "text-ink-dim opacity-70"
+              )}
+            >
+              {hasSubmitted ? (
+                <>
+                  <CheckCircle2 aria-hidden="true" className="h-3.5 w-3.5" />
+                  Your mail client should now be open — press send and we&apos;ll reply within a day.
+                </>
+              ) : (
+                "Opens in your mail app · replies within one business day"
+              )}
+            </p>
           </form>
         </div>
       </div>

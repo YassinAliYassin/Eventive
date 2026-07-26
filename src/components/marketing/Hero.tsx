@@ -1,4 +1,6 @@
 import { useReveal } from "../../hooks/useReveal";
+import { Button } from "../ui/Button";
+import { SectionLabel } from "../ui/SectionLabel";
 
 const STATS = [
   { value: "5", label: "Cities Serviced Nationwide" },
@@ -6,82 +8,83 @@ const STATS = [
   { value: "100%", label: "Owned Inventory, No Sub-Hires" },
 ];
 
+const CAPABILITIES = [
+  ["Coverage", "Harare, Bulawayo, Vic Falls, Nyanga, Selous"],
+  ["Inventory", "Marquees, line-array audio, generators, staging"],
+  ["Staffing", "Silver-service crews, mixologists, marshals"],
+  ["Power", "Silent diesel backup, 10–45kVA fleets"],
+];
+
 export function Hero() {
-  const ref = useReveal<HTMLDivElement>();
+  const ref = useReveal<HTMLDivElement>({ stagger: 90 });
 
   return (
-    <section id="home" className="relative z-[1] min-h-screen flex items-center pt-[160px] pb-[100px]">
-      <div ref={ref} className="max-w-[1180px] mx-auto px-7 w-full">
-        <div className="grid grid-cols-1 lg:grid-cols-[1.1fr_0.9fr] gap-16 items-center">
+    <section
+      id="home"
+      className="relative z-[1] flex min-h-[100svh] items-center pb-[100px] pt-[150px]"
+    >
+      <div ref={ref} className="mx-auto w-full max-w-[1180px] px-7">
+        <div className="grid grid-cols-1 items-center gap-16 lg:grid-cols-[1.1fr_0.9fr]">
           <div>
-            <div className="mb-6 font-mono text-[11px] tracking-[0.18em] uppercase text-brass-bright inline-flex items-center gap-2.5">
-              <span className="w-[18px] h-px bg-brass-bright inline-block" />
+            <SectionLabel className="reveal mb-6">
               Harare Logistics Hub · Est. Zimbabwe
-            </div>
-            <h1 className="font-serif font-medium text-paper leading-[1.04] mb-7 text-[40px] md:text-[56px] lg:text-[68px]">
+            </SectionLabel>
+            <h1 className="reveal mb-7 text-display font-medium text-balance font-serif text-paper">
               The full-service
               <br />
               <em className="italic text-azure">events logistics</em>
               <br />
               house of Zimbabwe.
             </h1>
-            <p className="text-base text-ink max-w-[480px] mb-10">
+            <p className="reveal mb-10 max-w-[480px] text-base text-pretty text-ink">
               From presidential-tier corporate summits to heritage Roora celebrations, Eventive owns and
               operates its entire inventory — marquees, sound, power, and staff — so nothing is ever left
               to a sub-hire.
             </p>
-            <div className="flex gap-4 flex-wrap mb-14">
-              <a
-                href="#contact"
-                className="font-mono text-xs tracking-[0.08em] uppercase bg-azure text-white px-8 py-4 rounded-full hover:bg-azure-bright hover:-translate-y-px transition-all shadow-md shadow-azure/20"
-              >
+            <div className="reveal mb-14 flex flex-wrap gap-4">
+              <Button href="#contact" withArrow>
                 Request a Quote
-              </a>
-              <a
-                href="#services"
-                className="glass font-mono text-xs tracking-[0.08em] uppercase px-8 py-4 rounded-full text-paper-dim hover:text-azure transition-colors"
-              >
+              </Button>
+              <Button href="#services" variant="glass">
                 View Capabilities
-              </a>
+              </Button>
             </div>
           </div>
 
-          <div className="relative">
-            <div className="glass relative rounded-[32px] p-10 overflow-hidden">
+          <div className="reveal relative">
+            <div className="glass relative overflow-hidden rounded-hero p-10">
               <div
-                className="absolute inset-0 opacity-[0.12] bg-cover bg-center"
+                className="absolute inset-0 bg-cover bg-center opacity-[0.12]"
                 style={{
                   backgroundImage:
                     "url('https://images.unsplash.com/photo-1519167758481-83f550bb49b3?auto=format&fit=crop&q=60&w=900')",
                 }}
               />
+              {/* Warms the lower half of the card so the list sits on a gradient, not flat glass */}
+              <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-clay-soft/40 to-transparent" />
+
               <div className="relative z-[1]">
-                <div className="w-28 h-28 rounded-full border-[1.5px] border-azure flex items-center justify-center mx-auto mb-6 relative">
-                  <div className="absolute inset-1.5 border border-azure rounded-full opacity-40" />
-                  <span className="font-serif italic text-azure text-[15px] text-center leading-[1.15]">
+                <div className="float-slow relative mx-auto mb-6 flex h-28 w-28 items-center justify-center rounded-full border-[1.5px] border-azure">
+                  <div className="absolute inset-1.5 rounded-full border border-azure opacity-40" />
+                  <span className="text-center font-serif text-[15px] italic leading-[1.15] text-azure">
                     EST.
                     <br />
                     HARARE
                   </span>
                 </div>
-                <h3 className="text-center font-serif text-[26px] text-paper mb-1.5">Eventive</h3>
-                <div className="text-center font-mono text-[10px] tracking-[0.14em] uppercase text-brass-bright mb-7">
+                <h2 className="mb-1.5 text-center font-serif text-[26px] text-paper">Eventive</h2>
+                <div className="mb-7 text-center font-mono text-[10px] uppercase tracking-[0.14em] text-clay-bright">
                   Zimbabwe · Nationwide Logistics
                 </div>
                 <ul className="flex flex-col gap-4">
-                  {[
-                    ["Coverage", "Harare, Bulawayo, Vic Falls, Nyanga, Selous"],
-                    ["Inventory", "Marquees, line-array audio, generators, staging"],
-                    ["Staffing", "Silver-service crews, mixologists, marshals"],
-                    ["Power", "Silent diesel backup, 10–45kVA fleets"],
-                  ].map(([label, value], idx) => (
+                  {CAPABILITIES.map(([label, value], idx) => (
                     <li
                       key={label}
-                      className={`flex gap-3 text-[13px] text-ink pt-4 ${
+                      className={`flex gap-3 pt-4 text-[13px] text-ink ${
                         idx > 0 ? "border-t border-line-soft" : ""
                       }`}
                     >
-                      <strong className="text-paper font-semibold min-w-[92px] inline-block">
+                      <strong className="inline-block min-w-[92px] font-semibold text-paper">
                         {label}
                       </strong>
                       {value}
@@ -93,13 +96,13 @@ export function Hero() {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-5 mt-16">
+        <div className="mt-16 grid grid-cols-1 gap-5 sm:grid-cols-3">
           {STATS.map((stat) => (
-            <div key={stat.label} className="glass rounded-3xl px-7 py-6">
-              <div className="font-sans font-bold text-paper text-[34px] tracking-tight leading-none">
+            <div key={stat.label} className="glass lift reveal rounded-card px-7 py-6">
+              <div className="font-sans text-[34px] font-bold leading-none tracking-tight text-paper">
                 {stat.value}
               </div>
-              <div className="font-mono text-[10px] tracking-[0.1em] uppercase text-ink-dim mt-2.5">
+              <div className="mt-2.5 font-mono text-[10px] uppercase tracking-[0.1em] text-ink-dim">
                 {stat.label}
               </div>
             </div>

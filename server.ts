@@ -11,7 +11,12 @@ app.use(helmet({
   contentSecurityPolicy: {
     directives: {
       defaultSrc: ["'self'"],
-      scriptSrc: ["'self'"]
+      scriptSrc: ["'self'"],
+      // Venue photography is hosted by the venues themselves, and the type ramp
+      // is served by Google Fonts. Scripts stay locked to our own origin.
+      imgSrc: ["'self'", "data:", "https:"],
+      styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
+      fontSrc: ["'self'", "data:", "https://fonts.gstatic.com"]
     }
   }
 }));
