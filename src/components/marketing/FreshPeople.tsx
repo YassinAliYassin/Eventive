@@ -22,15 +22,15 @@ export function FreshPeople() {
     <section id="fresh-people" className="relative z-[1] py-28">
       <div ref={ref} className="mx-auto max-w-[1180px] px-7">
         <div className="mb-10 max-w-[760px]">
-          <SectionLabel className="reveal mb-5">Across the Border · South Africa</SectionLabel>
+          <SectionLabel className="reveal mb-5">The Same Business, In South Africa</SectionLabel>
           <h2 className="reveal mb-5 text-section font-medium text-balance font-serif text-paper">
-            Staffing and event support in Johannesburg.
+            In South Africa, we are Fresh People.
           </h2>
           <p className="reveal text-[15px] text-pretty text-ink">
-            Where Eventive builds the structure, our South African arm{" "}
-            <strong className="font-semibold text-azure">Fresh People</strong> supplies the people —
-            a talent and events staffing agency working across Gauteng. If your event crosses the
-            border, the same standard follows it.
+            One business, two countries. In Zimbabwe we trade as Eventive; in South Africa as{" "}
+            <strong className="font-semibold text-azure">Fresh People</strong>, working out of
+            Johannesburg across Gauteng — talent, event support, and management. An event that
+            crosses the border does not change hands.
           </p>
         </div>
 

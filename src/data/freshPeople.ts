@@ -1,16 +1,16 @@
 /*
  * ─────────────────────────────────────────────────────────────────────────────
- * TODO — CONFIRM WITH FRESH PEOPLE BEFORE LAUNCH.
+ * Fresh People is the same business as Eventive, trading in South Africa. This
+ * is self-description, not a third party's catalogue.
  *
- * This describes a partner company's offering, and it was assembled from public
- * search results, NOT from fresh-people.co.za directly — that domain was
- * unreachable from the build environment, so nothing here has been read at
- * source. Publishing another company's service list inaccurately is their
- * problem as much as yours.
+ * TODO — CHECK IT ANYWAY. None of this was read from fresh-people.co.za; that
+ * domain was unreachable from the build environment, so the list is assembled
+ * from public search results about the site. It is your own offering, so you are
+ * the authority on it — correct anything that has drifted.
  *
- * Have someone at Fresh People confirm every line, and check the coverage,
- * response, and deployment claims at the bottom especially — those are
- * commitments, and they are the easiest to get wrong.
+ * Pay particular attention to FRESH_PEOPLE_FACTS. RSA certification, a 24-hour
+ * response, and a 48–72 hour deployment window are promises to customers, and
+ * they are the lines most likely to be out of date.
  * ─────────────────────────────────────────────────────────────────────────────
  */
 

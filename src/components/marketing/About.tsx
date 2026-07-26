@@ -57,6 +57,13 @@ export function About() {
               covering Bulawayo, Victoria Falls, Nyanga, and Selous — and inventory ranging from custom
               modular bar structures to line-array concert audio and glass marquees, all of it ours.
             </p>
+            <p className="mt-4 text-[15px] text-pretty text-ink">
+              South of the border the same business trades as{" "}
+              <a href="#fresh-people" className="font-semibold text-azure hover:text-azure-bright">
+                Fresh People
+              </a>
+              , staffing and running events across Gauteng.
+            </p>
           </div>
 
           <div className="glass lift reveal rounded-hero p-9 text-center">
