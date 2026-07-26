@@ -8,5 +8,8 @@
     "strict": true,
     "types": ["node"]
   },
-  "include": ["vite.config.ts", "server.ts"]
+  // server.ts is deliberately not here — it belongs to the main tsconfig so that
+  // `tsc --noEmit` type-checks it. Listing it in both makes it a composite output
+  // of this project and the main check fails with TS6305.
+  "include": ["vite.config.ts"]
 }

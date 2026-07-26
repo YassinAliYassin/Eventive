@@ -23,6 +23,8 @@
       "@/*": ["./src/*"]
     }
   },
-  "include": ["src"],
+  // server.ts is included so `npm run type-check` actually covers the API. It was
+  // previously checked by nothing, which is how a broken bundle reached main.
+  "include": ["src", "server.ts"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }

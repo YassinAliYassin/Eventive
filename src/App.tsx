@@ -3,6 +3,7 @@ import { Hero } from "./components/marketing/Hero";
 import { About } from "./components/marketing/About";
 import { Services } from "./components/marketing/Services";
 import { Manifest } from "./components/marketing/Manifest";
+import { Planner } from "./components/marketing/Planner";
 import { Work } from "./components/marketing/Work";
 import { Venues } from "./components/marketing/Venues";
 import { Testimonials } from "./components/marketing/Testimonials";
@@ -27,6 +28,7 @@ export default function App() {
         <Services />
         <Work />
         <Manifest />
+        <Planner />
         <Venues />
         <Testimonials />
         <Faq />
