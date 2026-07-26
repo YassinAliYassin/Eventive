@@ -1,0 +1,23 @@
+{
+  "name": "Eventive Zimbabwe",
+  "short_name": "Eventive",
+  "description": "Full-service events management, equipment hire, and logistics across Zimbabwe.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#dbe4f1",
+  "theme_color": "#dbe4f1",
+  "icons": [
+    {
+      "src": "/eventive-icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "/eventive-icon-mono.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "monochrome"
+    }
+  ]
+}

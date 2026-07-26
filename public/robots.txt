@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://eventive.co.zw/sitemap.xml

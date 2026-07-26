@@ -1,8 +1,12 @@
+import { Coffee, GraduationCap, Lightbulb, Milk, Sparkles, Tent, UtensilsCrossed } from "lucide-react";
 import { useReveal } from "../../hooks/useReveal";
+import { Button } from "../ui/Button";
+import { SectionLabel } from "../ui/SectionLabel";
 
 const SERVICES = [
   {
     tag: "Hospitality Elite",
+    icon: Coffee,
     title: "Mobile Coffee & Beverage Bars",
     description:
       "Signature beverage setups featuring handcrafted modular bar counters, elite mixologists, and full-service warm or cold hospitality.",
@@ -15,6 +19,7 @@ const SERVICES = [
   },
   {
     tag: "Structural Design",
+    icon: Tent,
     title: "Luxury Marquees & Tent Structures",
     description:
       "Weather-proof, safety-engineered, and majestic modular structures for premium temporary venues anywhere in Zimbabwe.",
@@ -27,6 +32,7 @@ const SERVICES = [
   },
   {
     tag: "Technical Production",
+    icon: Lightbulb,
     title: "High-End Sound, Lighting & Backups",
     description:
       "Concert-grade production, customized power backups, and immersive lighting choreography for flawless reliability.",
@@ -39,6 +45,7 @@ const SERVICES = [
   },
   {
     tag: "Cuisine & Staffing",
+    icon: UtensilsCrossed,
     title: "Gourmet Catering & Elite Service Crews",
     description:
       "Impeccable culinary journeys celebrating local heritage and international gastronomy, served by trained event teams.",
@@ -51,73 +58,81 @@ const SERVICES = [
   },
 ];
 
+const COFFEE_BAR_INCLUDES = [
+  { icon: Coffee, label: "Commercial Espresso Kit" },
+  { icon: Milk, label: "High-Grade Milks & Syrups" },
+  { icon: Sparkles, label: "Custom Cup Branding" },
+  { icon: GraduationCap, label: "Certified Barista Crew" },
+];
+
 export function Services() {
   const ref = useReveal<HTMLDivElement>();
 
   return (
-    <section id="services" className="py-28">
-      <div ref={ref} className="max-w-[1180px] mx-auto px-7">
-        <div className="reveal max-w-[760px] mb-14">
-          <div className="font-mono text-[11px] tracking-[0.18em] uppercase text-brass-bright inline-flex items-center gap-2.5 mb-5">
-            <span className="w-[18px] h-px bg-brass-bright inline-block" />
-            Stock Equipment &amp; Turn-Key Services
-          </div>
-          <h2 className="font-serif font-medium text-paper text-[34px] md:text-[42px] mb-5">
+    <section id="services" className="relative z-[1] py-28">
+      <div ref={ref} className="mx-auto max-w-[1180px] px-7">
+        <div className="mb-14 max-w-[760px]">
+          <SectionLabel className="reveal mb-5">Stock Equipment &amp; Turn-Key Services</SectionLabel>
+          <h2 className="reveal mb-5 text-section font-medium text-balance font-serif text-paper">
             What we deliver to your stage.
           </h2>
-          <p className="text-[15px] text-ink">
+          <p className="reveal text-[15px] text-pretty text-ink">
             We own and manage our complete logistics pipeline — no dependence on third-party sub-hires,
             ensuring gold-standard quality and uninterrupted delivery.
           </p>
         </div>
 
-        <div className="reveal grid grid-cols-1 md:grid-cols-2 gap-5">
-          {SERVICES.map((service) => (
-            <div key={service.title} className="glass rounded-[28px] p-9">
-              <span className="inline-block font-mono text-[9.5px] tracking-[0.1em] uppercase text-azure bg-azure-soft px-3 py-1.5 rounded-full mb-5">
-                {service.tag}
-              </span>
-              <h3 className="font-serif text-[26px] text-paper mb-2.5">{service.title}</h3>
-              <p className="text-[13.5px] text-ink mb-6">{service.description}</p>
-              <ul className="flex flex-col gap-3 border-t border-line-soft pt-6">
-                {service.items.map(([label, detail]) => (
-                  <li key={label} className="text-[12.5px] text-ink pl-4 relative">
-                    <span className="absolute left-0 text-azure">—</span>
-                    <strong className="text-paper font-semibold">{label}</strong> — {detail}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ))}
+        <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
+          {SERVICES.map((service) => {
+            const Icon = service.icon;
+            return (
+              <div key={service.title} className="glass lift reveal rounded-panel p-9">
+                <div className="mb-5 flex items-center gap-3">
+                  <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-azure-soft text-azure">
+                    <Icon aria-hidden="true" className="h-[18px] w-[18px]" />
+                  </span>
+                  <span className="inline-block rounded-full bg-clay-soft px-3 py-1.5 font-mono text-[9.5px] uppercase tracking-[0.1em] text-clay-bright">
+                    {service.tag}
+                  </span>
+                </div>
+                <h3 className="mb-2.5 font-serif text-[26px] text-balance text-paper">{service.title}</h3>
+                <p className="mb-6 text-[13.5px] text-pretty text-ink">{service.description}</p>
+                <ul className="flex flex-col gap-3 border-t border-line-soft pt-6">
+                  {service.items.map(([label, detail]) => (
+                    <li key={label} className="relative pl-4 text-[12.5px] text-pretty text-ink">
+                      <span aria-hidden="true" className="absolute left-0 top-[0.55em] h-1 w-1 rounded-full bg-azure" />
+                      <strong className="font-semibold text-paper">{label}</strong> — {detail}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            );
+          })}
         </div>
 
-        <div className="reveal glass-strong rounded-[28px] mt-5 p-10 flex justify-between items-center gap-9 flex-wrap">
+        <div className="glass-strong reveal mt-5 flex flex-wrap items-center justify-between gap-9 rounded-panel p-10">
           <div>
-            <div className="font-mono text-[11px] tracking-[0.18em] uppercase text-brass-bright inline-flex items-center gap-2.5 mb-4">
-              <span className="w-[18px] h-px bg-brass-bright inline-block" />
-              Special Focus
-            </div>
-            <h3 className="font-serif italic text-[28px] text-paper mb-3">
+            <SectionLabel className="mb-4">Special Focus</SectionLabel>
+            <h3 className="mb-3 font-serif text-[28px] italic text-balance text-paper">
               The Artisan Mobile Coffee Bar experience
             </h3>
-            <p className="text-[13.5px] text-ink max-w-[520px]">
+            <p className="max-w-[520px] text-[13.5px] text-pretty text-ink">
               Unlike standard self-serve urns, our mobile espresso bar offers single-origin Arabica beans
               sourced from Zimbabwe&apos;s Eastern Highlands and East Africa — served in elegant porcelain or
               custom-branded cups.
             </p>
-            <div className="flex gap-5 flex-wrap mt-5 font-mono text-[10.5px] text-ink-dim">
-              <span>☕ Commercial Espresso Kit</span>
-              <span>🥛 High-Grade Milks &amp; Syrups</span>
-              <span>✨ Custom Cup Branding</span>
-              <span>🎓 Certified Barista Crew</span>
-            </div>
+            <ul className="mt-5 flex flex-wrap gap-x-5 gap-y-3 font-mono text-[10.5px] text-ink-dim">
+              {COFFEE_BAR_INCLUDES.map(({ icon: Icon, label }) => (
+                <li key={label} className="flex items-center gap-2">
+                  <Icon aria-hidden="true" className="h-3.5 w-3.5 text-clay" />
+                  {label}
+                </li>
+              ))}
+            </ul>
           </div>
-          <a
-            href="#contact"
-            className="font-mono text-xs tracking-[0.08em] uppercase bg-azure text-white px-8 py-4 rounded-full hover:bg-azure-bright transition-colors whitespace-nowrap shadow-md shadow-azure/20"
-          >
+          <Button href="#contact" withArrow>
             Add to Quote
-          </a>
+          </Button>
         </div>
       </div>
     </section>

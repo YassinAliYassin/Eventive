@@ -1,57 +1,72 @@
-import { VENUES } from "../../data/venues";
+import { MapPin, Users } from "lucide-react";
+import { VENUES, type Venue } from "../../data/venues";
 import { useReveal } from "../../hooks/useReveal";
+import { SectionLabel } from "../ui/SectionLabel";
+
+/*
+ * Typographic by design — see the note in data/venues.ts. Without photography the
+ * card has to carry itself, so the venue name is set large in the display serif
+ * and a soft corner wash gives the glass something to catch.
+ */
+function VenueCard({ venue }: { venue: Venue }) {
+  return (
+    <article className="glass lift reveal relative flex h-full flex-col overflow-hidden rounded-panel p-8">
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute -right-16 -top-16 h-48 w-48 rounded-full bg-gradient-to-br from-azure/12 to-clay/10 blur-2xl"
+      />
+
+      <div className="relative flex flex-1 flex-col">
+        <span className="inline-flex w-fit items-center gap-1.5 rounded-full bg-clay-soft px-3 py-1.5 font-mono text-[10px] uppercase tracking-[0.12em] text-clay-bright">
+          <MapPin aria-hidden="true" className="h-3 w-3" />
+          {venue.location}
+        </span>
+
+        <h3 className="mt-5 font-serif text-[28px] leading-[1.15] text-balance text-paper">
+          {venue.name}
+        </h3>
+
+        <span aria-hidden="true" className="mt-4 block h-px w-10 bg-clay/40" />
+
+        <p className="mt-4 text-[13.5px] leading-relaxed text-pretty text-ink">
+          {venue.description}
+        </p>
+
+        {/* mt-auto keeps the capacity rule on the same line across every card */}
+        <div className="mt-auto flex items-baseline justify-between border-t border-line-soft pt-4">
+          <span className="inline-flex items-center gap-1.5 font-mono text-[10.5px] uppercase tracking-[0.12em] text-ink-dim">
+            <Users aria-hidden="true" className="h-3 w-3" />
+            Capacity
+          </span>
+          <strong className="font-sans text-[17px] font-bold tracking-tight text-azure">
+            {venue.capacity}
+          </strong>
+        </div>
+      </div>
+    </article>
+  );
+}
 
 export function Venues() {
   const ref = useReveal<HTMLDivElement>();
 
   return (
-    <section id="venues" className="py-28">
-      <div ref={ref} className="max-w-[1180px] mx-auto px-7">
-        <div className="reveal max-w-[760px] mb-10">
-          <div className="font-mono text-[11px] tracking-[0.18em] uppercase text-clay-bright inline-flex items-center gap-2.5 mb-5">
-            <span className="w-[18px] h-px bg-clay-bright inline-block" />
-            Nationwide Coverage
-          </div>
-          <h2 className="font-serif font-medium text-paper text-[34px] md:text-[42px] mb-5">
+    <section id="venues" className="relative z-[1] py-28">
+      <div ref={ref} className="mx-auto max-w-[1180px] px-7">
+        <div className="mb-10 max-w-[760px]">
+          <SectionLabel className="reveal mb-5">Nationwide Coverage</SectionLabel>
+          <h2 className="reveal mb-5 text-section font-medium text-balance font-serif text-paper">
             Venues on the manifest.
           </h2>
-          <p className="text-[15px] text-ink">
-            Our transport and rigging crews are calibrated to these routes — or bring the full Eventive
+          <p className="reveal text-[15px] text-pretty text-ink">
+            Our transport and rigging are planned around these routes — or bring the full Eventive
             build to your own private estate, homestead, or courtyard.
           </p>
         </div>
 
-        <div className="reveal grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 items-stretch gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {VENUES.map((venue) => (
-            <article
-              key={venue.id}
-              className="group relative h-[420px] rounded-[28px] overflow-hidden shadow-[0_12px_40px_rgba(16,23,34,0.14)] hover:-translate-y-1 transition-transform duration-300"
-            >
-              {/* Photograph fills the card; the glass panel below frosts it directly */}
-              <img
-                src={venue.image}
-                alt={venue.name}
-                loading="lazy"
-                className="absolute inset-0 w-full h-full object-cover group-hover:scale-[1.06] transition-transform duration-700"
-              />
-
-              <span className="absolute top-4 left-4 glass-chip font-mono text-[10.5px] tracking-[0.12em] uppercase text-clay-bright px-3.5 py-2 rounded-full">
-                {venue.location}
-              </span>
-
-              <div className="glass-photo absolute inset-x-3 bottom-3 rounded-[22px] px-6 py-5">
-                <h3 className="font-serif text-[24px] leading-tight text-paper mb-2">{venue.name}</h3>
-                <p className="text-[13px] leading-relaxed text-ink mb-4">{venue.description}</p>
-                <div className="flex justify-between items-baseline border-t border-line-soft pt-3.5">
-                  <span className="font-mono text-[10.5px] tracking-[0.12em] uppercase text-ink-dim">
-                    Capacity
-                  </span>
-                  <strong className="font-sans font-bold text-[17px] text-azure tracking-tight">
-                    {venue.capacity}
-                  </strong>
-                </div>
-              </div>
-            </article>
+            <VenueCard key={venue.id} venue={venue} />
           ))}
         </div>
       </div>
