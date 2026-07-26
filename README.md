@@ -71,8 +71,14 @@ If you add past-performance claims later, make sure they are true — and keep
 
 ## Notes
 
-- Venue and gallery photography is hotlinked from third-party hosts. Anything
-  unreachable degrades to a branded gradient via `CoverImage` rather than
-  blanking the card.
+- **Venue cards carry no photography, deliberately.** Those images belong to the
+  venues and to the photographers who shot them; hotlinking them from the venues'
+  own sites published their work without a licence and used their bandwidth. The
+  cards are typographic instead. Do not add images back without written
+  permission for each venue.
+- The build-format gallery still hotlinks stock photography, which the Unsplash
+  licence permits commercially. Replace it with your own images as real builds
+  are shot. Anything unreachable degrades to a branded gradient via `CoverImage`
+  rather than blanking the card.
 - The Content-Security-Policy in `server.ts` allows images over HTTPS and fonts
   from Google Fonts. `script-src` stays locked to this origin.

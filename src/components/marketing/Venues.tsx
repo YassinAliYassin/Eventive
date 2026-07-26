@@ -1,35 +1,39 @@
 import { MapPin, Users } from "lucide-react";
 import { VENUES, type Venue } from "../../data/venues";
 import { useReveal } from "../../hooks/useReveal";
-import { CoverImage } from "../ui/CoverImage";
 import { SectionLabel } from "../ui/SectionLabel";
 
+/*
+ * Typographic by design — see the note in data/venues.ts. Without photography the
+ * card has to carry itself, so the venue name is set large in the display serif
+ * and a soft corner wash gives the glass something to catch.
+ */
 function VenueCard({ venue }: { venue: Venue }) {
   return (
-    <article className="glass lift reveal group relative h-[400px] overflow-hidden rounded-panel p-0 shadow-[0_12px_40px_rgba(16,23,34,0.14)] sm:h-[420px]">
-      <CoverImage
-        src={venue.image}
-        alt={`${venue.name}, ${venue.location}`}
-        className="transition-transform duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.06]"
-      />
-
-      {/* Keeps the top chip legible over bright skies */}
+    <article className="glass lift reveal relative flex h-full flex-col overflow-hidden rounded-panel p-8">
       <div
         aria-hidden="true"
-        className="absolute inset-x-0 top-0 h-28 bg-gradient-to-b from-black/20 to-transparent"
+        className="pointer-events-none absolute -right-16 -top-16 h-48 w-48 rounded-full bg-gradient-to-br from-azure/12 to-clay/10 blur-2xl"
       />
 
-      <span className="glass-chip absolute left-4 top-4 inline-flex items-center gap-1.5 rounded-full px-3.5 py-2 font-mono text-[10.5px] uppercase tracking-[0.12em] text-clay-bright">
-        <MapPin aria-hidden="true" className="h-3 w-3" />
-        {venue.location}
-      </span>
+      <div className="relative flex flex-1 flex-col">
+        <span className="inline-flex w-fit items-center gap-1.5 rounded-full bg-clay-soft px-3 py-1.5 font-mono text-[10px] uppercase tracking-[0.12em] text-clay-bright">
+          <MapPin aria-hidden="true" className="h-3 w-3" />
+          {venue.location}
+        </span>
 
-      <div className="glass-photo absolute inset-x-3 bottom-3 rounded-card px-6 py-5">
-        <h3 className="mb-2 font-serif text-[24px] leading-tight text-balance text-paper">
+        <h3 className="mt-5 font-serif text-[28px] leading-[1.15] text-balance text-paper">
           {venue.name}
         </h3>
-        <p className="mb-4 text-[13px] leading-relaxed text-pretty text-ink">{venue.description}</p>
-        <div className="flex items-baseline justify-between border-t border-line-soft pt-3.5">
+
+        <span aria-hidden="true" className="mt-4 block h-px w-10 bg-clay/40" />
+
+        <p className="mt-4 text-[13.5px] leading-relaxed text-pretty text-ink">
+          {venue.description}
+        </p>
+
+        {/* mt-auto keeps the capacity rule on the same line across every card */}
+        <div className="mt-auto flex items-baseline justify-between border-t border-line-soft pt-4">
           <span className="inline-flex items-center gap-1.5 font-mono text-[10.5px] uppercase tracking-[0.12em] text-ink-dim">
             <Users aria-hidden="true" className="h-3 w-3" />
             Capacity
@@ -60,7 +64,7 @@ export function Venues() {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid grid-cols-1 items-stretch gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {VENUES.map((venue) => (
             <VenueCard key={venue.id} venue={venue} />
           ))}
