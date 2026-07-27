@@ -4,6 +4,7 @@ import { Trash2, Copy, DoorOpen, Ruler } from "lucide-react";
 import { catalogEntry } from "./catalog";
 import { cornerMap, formatArea, formatLength, uid, wallLength } from "./geometry";
 import type { Room } from "./geometry";
+import { isEventLayout, planMetrics, STANDING_AREA_PER_GUEST } from "./metrics";
 import {
   duplicateItem,
   moveCorner,
@@ -12,6 +13,7 @@ import {
   removeOpening,
   removeWall,
   setRoomStyle,
+  setWallLength,
   updateItem,
   updateOpening,
   updateSettings,
@@ -98,6 +100,15 @@ export function Inspector(props: InspectorProps) {
                 value={formatArea(length * wall.height, plan.settings.units)}
               />
             </div>
+            <Field label="Set length">
+              <NumberInput
+                value={length}
+                step={0.05}
+                min={0.1}
+                suffix="m"
+                onChange={(next) => apply((current) => setWallLength(current, wall.id, next))}
+              />
+            </Field>
             <Field label="Height">
               <NumberInput
                 value={wall.height}
@@ -419,21 +430,40 @@ export function Inspector(props: InspectorProps) {
  * ------------------------------------------------------------------ */
 
 function PlanPanel({ plan, rooms, apply, onRename }: InspectorProps) {
-  const corners = cornerMap(plan);
-  const floorArea = rooms.reduce((sum, room) => sum + room.area, 0);
-  const wallRun = plan.walls.reduce((sum, wall) => sum + wallLength(wall, corners), 0);
+  const metrics = planMetrics(plan, rooms);
 
   return (
     <>
       <Section title="Property">
         <TextInput value={plan.name} onChange={onRename} className="w-full" />
         <div className="grid grid-cols-2 gap-2">
-          <Stat label="Floor area" value={formatArea(floorArea, plan.settings.units)} />
+          <Stat label="Floor area" value={formatArea(metrics.floorArea, plan.settings.units)} />
           <Stat label="Rooms" value={`${rooms.length}`} />
-          <Stat label="Wall run" value={formatLength(wallRun, plan.settings.units)} />
-          <Stat label="Items" value={`${plan.items.length}`} />
+          <Stat label="Wall run" value={formatLength(metrics.wallRun, plan.settings.units)} />
+          <Stat label="Openings" value={`${metrics.openings}`} />
         </div>
       </Section>
+
+      {isEventLayout(metrics) && (
+        <Section title="Event capacity">
+          <div className="grid grid-cols-2 gap-2">
+            <Stat label="Seats placed" value={`${metrics.seats}`} />
+            <Stat label="Tables" value={`${metrics.tables}`} />
+            <Stat
+              label={`Standing (${STANDING_AREA_PER_GUEST} m²/guest)`}
+              value={`${metrics.standingCapacity}`}
+            />
+            <Stat
+              label="Dance floor"
+              value={formatArea(metrics.danceFloorArea, plan.settings.units)}
+            />
+          </div>
+          <EmptyHint>
+            Seats are counted from the chairs actually placed, so the figure matches what the
+            crew will physically set out.
+          </EmptyHint>
+        </Section>
+      )}
 
       <Section title="Rooms">
         {rooms.length === 0 ? (

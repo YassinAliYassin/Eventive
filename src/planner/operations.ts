@@ -210,6 +210,30 @@ export function removeCorner(plan: Plan, id: string): Plan {
   );
 }
 
+/**
+ * Sets a wall to an exact length by sliding its end corner along the wall's own
+ * direction. Everything attached to that corner comes with it, which is what
+ * makes typing "4.20 m" behave the way a draughtsman expects.
+ */
+export function setWallLength(plan: Plan, id: string, length: number): Plan {
+  const wall = plan.walls.find((w) => w.id === id);
+  if (!wall || length <= 0.05) return plan;
+  const corners = cornerMap(plan);
+  const start = corners.get(wall.start);
+  const end = corners.get(wall.end);
+  if (!start || !end) return plan;
+
+  const current = dist(start, end);
+  if (current < 1e-6) return plan;
+  const dirX = (end.x - start.x) / current;
+  const dirY = (end.y - start.y) / current;
+
+  return moveCorner(plan, wall.end, {
+    x: start.x + dirX * length,
+    y: start.y + dirY * length,
+  });
+}
+
 export function updateWall(plan: Plan, id: string, patch: Partial<Wall>): Plan {
   return touch({
     ...plan,

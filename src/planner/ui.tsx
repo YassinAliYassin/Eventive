@@ -1,6 +1,90 @@
 /** Small presentational primitives shared by the planner panels. */
 
+import { useEffect, useRef, useState } from "react";
 import type { ChangeEvent, ReactNode } from "react";
+
+/**
+ * Button with a dropdown. Keeps the toolbar to a handful of controls, which is
+ * what makes the studio usable on a phone as well as a desktop.
+ */
+export function Menu({
+  label,
+  icon,
+  children,
+  align = "right",
+}: {
+  label: string;
+  icon: ReactNode;
+  children: ReactNode | ((close: () => void) => ReactNode);
+  align?: "left" | "right";
+}) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    if (!open) return;
+    const onPointerDown = (event: PointerEvent) => {
+      if (!ref.current?.contains(event.target as Node)) setOpen(false);
+    };
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setOpen(false);
+    };
+    document.addEventListener("pointerdown", onPointerDown);
+    document.addEventListener("keydown", onKeyDown);
+    return () => {
+      document.removeEventListener("pointerdown", onPointerDown);
+      document.removeEventListener("keydown", onKeyDown);
+    };
+  }, [open]);
+
+  return (
+    <div ref={ref} className="relative">
+      <button
+        type="button"
+        onClick={() => setOpen((value) => !value)}
+        aria-expanded={open}
+        className={`flex items-center gap-1.5 rounded-lg border px-2.5 py-1.5 text-xs font-medium transition ${
+          open
+            ? "border-azure/40 bg-azure-soft text-azure-bright"
+            : "border-line bg-white/60 text-paper-dim hover:bg-white"
+        }`}
+      >
+        {icon}
+        <span className="hidden sm:inline">{label}</span>
+      </button>
+      {open && (
+        <div
+          className={`absolute top-full z-40 mt-1 w-60 rounded-xl border border-line bg-panel-raised p-2 shadow-lg backdrop-blur ${
+            align === "right" ? "right-0" : "left-0"
+          }`}
+        >
+          {typeof children === "function" ? children(() => setOpen(false)) : children}
+        </div>
+      )}
+    </div>
+  );
+}
+
+export function MenuItem({
+  children,
+  onClick,
+  icon,
+}: {
+  children: ReactNode;
+  onClick: () => void;
+  icon?: ReactNode;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className="flex w-full items-center gap-2 rounded-lg px-2.5 py-2 text-left text-xs font-medium text-paper-dim transition hover:bg-azure-soft hover:text-azure-bright"
+    >
+      {icon}
+      {children}
+    </button>
+  );
+}
 
 export function Section({ title, children }: { title: string; children: ReactNode }) {
   return (

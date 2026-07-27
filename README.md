@@ -42,6 +42,7 @@ model on the right" layout comes from the same lineage.
 | `src/planner/draw2d.ts`, `Plan2D.tsx` | Canvas plan view and its gestures |
 | `src/planner/scene3d.ts`, `items3d.ts`, `View3D.tsx` | three.js scene, furniture meshes, React wrapper |
 | `src/planner/catalog.ts` | Furnishings, house and event, at real dimensions |
+| `src/planner/metrics.ts` | Areas, wall runs, seats and standing capacity |
 | `src/planner/samples.ts` | Starter plans |
 
 ### What it does
@@ -56,7 +57,11 @@ model on the right" layout comes from the same lineage.
 - **Edit anywhere** — select a wall, room, opening or item in either view and
   change it in the inspector; drag furniture directly in the 3D view.
 - **Read the numbers** — wall lengths, room areas and totals update as you draw,
-  in metres or feet and inches.
+  in metres or feet and inches. Type an exact length onto a wall and its far
+  corner slides to suit, carrying everything attached to it.
+- **Size the event** — for layouts using event kit, the inspector reports seats
+  actually placed, table count, dance floor area and standing capacity at
+  1.2 m² a guest.
 - **Undo/redo** the whole history, with autosave to the browser.
 - **Export** the plan as PNG, the 3D view as a render, or the editable plan as
   JSON (which imports back).
@@ -68,8 +73,11 @@ model on the right" layout comes from the same lineage.
 arrows nudge · `R` rotates a selected item · hold `Alt` to ignore the grid ·
 `Esc` cancels.
 
+The walkthrough collides with walls and passes through doorways and arches, so
+a client sees the space the way they will actually move through it.
+
 ### Known limits
 
 - Single storey — no floor levels or roofs.
-- The walkthrough camera passes through walls.
-- The catalogue and inspector panels need a tablet-width screen or wider.
+- Furniture does not block the walkthrough, only walls do.
+- Rooms must be closed loops; a half-drawn wall has no floor until it joins up.

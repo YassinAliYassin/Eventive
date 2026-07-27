@@ -152,19 +152,28 @@ function drawRooms(ctx: CanvasRenderingContext2D, state: DrawState): void {
     }
   }
 
-  // Labels last so walls never sit on top of the text.
+  // Labels last so walls never sit on top of the text. Rooms too small on
+  // screen to hold their label drop it rather than colliding with neighbours.
   for (const room of rooms) {
+    const screenArea = room.area * view.scale * view.scale;
+    if (screenArea < 900) continue;
+
     const centre = toScreen(room.centroid, view);
     const name = plan.rooms[room.id]?.name ?? "Room";
-    const size = Math.max(11, Math.min(16, view.scale * 0.34));
+    const size = Math.max(10, Math.min(16, view.scale * 0.34));
+    const withArea = screenArea > 3200;
+
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
     ctx.fillStyle = PALETTE.ink;
     ctx.font = `600 ${size}px Inter, system-ui, sans-serif`;
-    ctx.fillText(name.toUpperCase(), centre.x, centre.y - size * 0.6);
-    ctx.fillStyle = PALETTE.roomText;
-    ctx.font = `500 ${size * 0.85}px "JetBrains Mono", ui-monospace, monospace`;
-    ctx.fillText(formatArea(room.area, plan.settings.units), centre.x, centre.y + size * 0.7);
+    ctx.fillText(name.toUpperCase(), centre.x, centre.y - (withArea ? size * 0.6 : 0));
+
+    if (withArea) {
+      ctx.fillStyle = PALETTE.roomText;
+      ctx.font = `500 ${size * 0.85}px "JetBrains Mono", ui-monospace, monospace`;
+      ctx.fillText(formatArea(room.area, plan.settings.units), centre.x, centre.y + size * 0.7);
+    }
   }
 }
 

@@ -46,12 +46,14 @@ export function fitView(
   bounds: Bounds,
   width: number,
   height: number,
-  padding = 64
+  padding?: number
 ): View {
+  // Fixed padding wastes most of a phone viewport, so scale it to the pane.
+  const margin = padding ?? Math.min(64, Math.max(14, Math.min(width, height) * 0.07));
   const spanX = Math.max(0.5, bounds.maxX - bounds.minX);
   const spanY = Math.max(0.5, bounds.maxY - bounds.minY);
   const scale = clampScale(
-    Math.min((width - padding * 2) / spanX, (height - padding * 2) / spanY)
+    Math.min((width - margin * 2) / spanX, (height - margin * 2) / spanY)
   );
   const centreX = (bounds.minX + bounds.maxX) / 2;
   const centreY = (bounds.minY + bounds.maxY) / 2;

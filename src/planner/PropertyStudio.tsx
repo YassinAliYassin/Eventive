@@ -7,12 +7,13 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   ArrowLeft,
   Camera,
-  ChevronDown,
+  FileDown,
+  Home,
+  SlidersHorizontal,
+  X,
   DoorOpen,
   Download,
-  Eye,
   Footprints,
-  Grid3x3,
   Hand,
   Layers,
   Maximize2,
@@ -20,10 +21,8 @@ import {
   PanelRight,
   PenLine,
   Redo2,
-  Ruler,
   Sofa,
   Square,
-  SunMedium,
   Trash2,
   Undo2,
   Upload,
@@ -43,7 +42,7 @@ import { createSample, SAMPLES } from "./samples";
 import type { PropertyScene, WallMode, CameraMode } from "./scene3d";
 import { loadSavedPlan, normalizePlan, usePlanner } from "./store";
 import type { Plan, Selection, Tool } from "./types";
-import { Button } from "./ui";
+import { Menu, MenuItem, Toggle } from "./ui";
 
 type ViewMode = "2d" | "split" | "3d";
 
@@ -64,16 +63,17 @@ export function PropertyStudio() {
   const [selection, setSelection] = useState<Selection | null>(null);
   const [tool, setTool] = useState<Tool>("select");
   const [pendingCatalogId, setPendingCatalogId] = useState<string | null>(null);
-  const [viewMode, setViewMode] = useState<ViewMode>("split");
+  // A phone cannot usefully show two panes or a docked inspector at once.
+  const wideScreen = typeof window === "undefined" || window.innerWidth >= 1024;
+  const [viewMode, setViewMode] = useState<ViewMode>(wideScreen ? "split" : "2d");
   const [cameraMode, setCameraMode] = useState<CameraMode>("orbit");
   const [wallMode, setWallMode] = useState<WallMode>("full");
   const [showGrid, setShowGrid] = useState(true);
   const [showDimensions, setShowDimensions] = useState(true);
   const [showFurniture, setShowFurniture] = useState(true);
   const [shadows, setShadows] = useState(true);
-  const [inspectorOpen, setInspectorOpen] = useState(true);
+  const [inspectorOpen, setInspectorOpen] = useState(wideScreen);
   const [fitToken, setFitToken] = useState(0);
-  const [samplesOpen, setSamplesOpen] = useState(false);
 
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const sceneRef = useRef<PropertyScene | null>(null);
@@ -113,7 +113,6 @@ export function PropertyStudio() {
     (id: string) => {
       load(createSample(id));
       setSelection(null);
-      setSamplesOpen(false);
       setFitToken((token) => token + 1);
     },
     [load]
@@ -218,17 +217,9 @@ export function PropertyStudio() {
 
         <div className="h-5 w-px bg-line" />
 
-        <div className="relative">
-          <button
-            type="button"
-            onClick={() => setSamplesOpen((open) => !open)}
-            className="flex items-center gap-1.5 rounded-lg border border-line bg-white/60 px-2.5 py-1.5 text-xs font-medium text-paper-dim transition hover:bg-white"
-          >
-            {plan.name}
-            <ChevronDown className="h-3 w-3" />
-          </button>
-          {samplesOpen && (
-            <div className="absolute left-0 top-full z-30 mt-1 w-64 rounded-xl border border-line bg-panel-raised p-1.5 shadow-lg backdrop-blur">
+        <Menu label={plan.name} icon={<Home className="h-3.5 w-3.5" />} align="left">
+          {(close) => (
+            <>
               <p className="px-2 py-1 font-mono text-[9px] uppercase tracking-[0.14em] text-clay">
                 Start from
               </p>
@@ -236,16 +227,19 @@ export function PropertyStudio() {
                 <button
                   key={sample.id}
                   type="button"
-                  onClick={() => startSample(sample.id)}
+                  onClick={() => {
+                    startSample(sample.id);
+                    close();
+                  }}
                   className="w-full rounded-lg px-2 py-1.5 text-left transition hover:bg-azure-soft"
                 >
                   <span className="block text-xs font-medium text-paper-dim">{sample.name}</span>
                   <span className="block text-[10px] leading-snug text-ink-dim">{sample.blurb}</span>
                 </button>
               ))}
-            </div>
+            </>
           )}
-        </div>
+        </Menu>
 
         <div className="flex items-center gap-1">
           <IconButton label="Undo (Ctrl+Z)" onClick={undo} disabled={!canUndo}>
@@ -259,7 +253,7 @@ export function PropertyStudio() {
           </IconButton>
         </div>
 
-        <div className="ml-auto flex flex-wrap items-center gap-1.5">
+        <div className="ml-auto flex items-center gap-1.5">
           <Segmented
             value={viewMode}
             onChange={setViewMode}
@@ -270,77 +264,92 @@ export function PropertyStudio() {
             ]}
           />
 
-          <IconButton
-            label={showGrid ? "Hide grid" : "Show grid"}
-            onClick={() => setShowGrid((value) => !value)}
-            active={showGrid}
-          >
-            <Grid3x3 className="h-4 w-4" />
-          </IconButton>
-          <IconButton
-            label={showDimensions ? "Hide dimensions" : "Show dimensions"}
-            onClick={() => setShowDimensions((value) => !value)}
-            active={showDimensions}
-          >
-            <Ruler className="h-4 w-4" />
-          </IconButton>
-          <IconButton
-            label={showFurniture ? "Hide furnishings" : "Show furnishings"}
-            onClick={() => setShowFurniture((value) => !value)}
-            active={showFurniture}
-          >
-            <Sofa className="h-4 w-4" />
-          </IconButton>
-          <IconButton
-            label={
-              wallMode === "full"
-                ? "Walls: full height"
-                : wallMode === "low"
-                  ? "Walls: dollhouse"
-                  : "Walls: hidden"
-            }
-            onClick={() =>
-              setWallMode((mode) => (mode === "full" ? "low" : mode === "low" ? "none" : "full"))
-            }
-            active={wallMode !== "full"}
-          >
-            <Eye className="h-4 w-4" />
-          </IconButton>
-          <IconButton
-            label={shadows ? "Shadows on" : "Shadows off"}
-            onClick={() => setShadows((value) => !value)}
-            active={shadows}
-          >
-            <SunMedium className="h-4 w-4" />
-          </IconButton>
-          <IconButton
-            label={cameraMode === "walk" ? "Exit walkthrough" : "Walk through"}
-            onClick={() => {
-              if (viewMode === "2d") setViewMode("split");
-              setCameraMode(cameraMode === "walk" ? "orbit" : "walk");
-            }}
-            active={cameraMode === "walk"}
-          >
-            <Footprints className="h-4 w-4" />
-          </IconButton>
-          <IconButton label="Fit both views" onClick={() => setFitToken((token) => token + 1)}>
-            <Maximize2 className="h-4 w-4" />
-          </IconButton>
+          <Menu label="View" icon={<SlidersHorizontal className="h-3.5 w-3.5" />}>
+            <div className="space-y-1.5">
+              <Toggle label="Grid" checked={showGrid} onChange={setShowGrid} />
+              <Toggle label="Dimensions" checked={showDimensions} onChange={setShowDimensions} />
+              <Toggle label="Furnishings" checked={showFurniture} onChange={setShowFurniture} />
+              <Toggle label="Shadows" checked={shadows} onChange={setShadows} />
+              <div className="pt-1">
+                <p className="px-1 pb-1 font-mono text-[9px] uppercase tracking-[0.14em] text-clay">
+                  Walls in 3D
+                </p>
+                <div className="flex rounded-lg border border-line bg-white/50 p-0.5">
+                  {(["full", "low", "none"] as WallMode[]).map((mode) => (
+                    <button
+                      key={mode}
+                      type="button"
+                      onClick={() => setWallMode(mode)}
+                      className={`flex-1 rounded-md px-2 py-1 text-[11px] font-medium capitalize transition ${
+                        wallMode === mode ? "bg-azure text-white" : "text-ink-dim hover:text-azure"
+                      }`}
+                    >
+                      {mode === "low" ? "Dollhouse" : mode}
+                    </button>
+                  ))}
+                </div>
+              </div>
+              <MenuItem
+                icon={<Footprints className="h-3.5 w-3.5" />}
+                onClick={() => {
+                  if (viewMode === "2d") setViewMode(wideScreen ? "split" : "3d");
+                  setCameraMode(cameraMode === "walk" ? "orbit" : "walk");
+                }}
+              >
+                {cameraMode === "walk" ? "Exit walkthrough" : "Walk through"}
+              </MenuItem>
+              <MenuItem
+                icon={<Maximize2 className="h-3.5 w-3.5" />}
+                onClick={() => setFitToken((token) => token + 1)}
+              >
+                Fit both views
+              </MenuItem>
+            </div>
+          </Menu>
 
-          <div className="h-5 w-px bg-line" />
+          <Menu label="Export" icon={<FileDown className="h-3.5 w-3.5" />}>
+            {(close) => (
+              <>
+                <MenuItem
+                  icon={<Download className="h-3.5 w-3.5" />}
+                  onClick={() => {
+                    exportPng();
+                    close();
+                  }}
+                >
+                  Plan as PNG
+                </MenuItem>
+                <MenuItem
+                  icon={<Camera className="h-3.5 w-3.5" />}
+                  onClick={() => {
+                    exportRender();
+                    close();
+                  }}
+                >
+                  3D view as PNG
+                </MenuItem>
+                <MenuItem
+                  icon={<Download className="h-3.5 w-3.5" />}
+                  onClick={() => {
+                    exportJson();
+                    close();
+                  }}
+                >
+                  Editable plan (JSON)
+                </MenuItem>
+                <MenuItem
+                  icon={<Upload className="h-3.5 w-3.5" />}
+                  onClick={() => {
+                    fileRef.current?.click();
+                    close();
+                  }}
+                >
+                  Open a plan file
+                </MenuItem>
+              </>
+            )}
+          </Menu>
 
-          <Button onClick={exportPng} title="Download the 2D plan as PNG">
-            <Download className="h-3.5 w-3.5" /> Plan
-          </Button>
-          <Button onClick={exportRender} title="Download the 3D view as PNG">
-            <Camera className="h-3.5 w-3.5" /> Render
-          </Button>
-          <Button onClick={exportJson} title="Download the editable plan file">
-            <Download className="h-3.5 w-3.5" /> JSON
-          </Button>
-          <Button onClick={() => fileRef.current?.click()} title="Open a plan file">
-            <Upload className="h-3.5 w-3.5" /> Open
-          </Button>
           <input
             ref={fileRef}
             type="file"
@@ -362,7 +371,7 @@ export function PropertyStudio() {
         </div>
       </header>
 
-      <div className="flex min-h-0 flex-1">
+      <div className="relative flex min-h-0 flex-1">
         {/* Tool rail */}
         <nav className="z-10 flex w-12 flex-col items-center gap-1 border-r border-line bg-panel py-2">
           {TOOLS.map(({ tool: value, label, icon: Icon, key }) => (
@@ -382,9 +391,17 @@ export function PropertyStudio() {
           ))}
         </nav>
 
-        {/* Catalogue */}
+        {/* Catalogue — docked on wide screens, a slide-over on narrow ones */}
         {tool === "item" && (
-          <aside className="hidden w-60 flex-shrink-0 border-r border-line bg-panel md:block">
+          <aside className="absolute inset-y-0 left-12 z-30 w-60 border-r border-line bg-panel-raised backdrop-blur-xl shadow-2xl md:static md:z-auto md:w-60 md:flex-shrink-0 md:bg-panel md:shadow-none">
+            <button
+              type="button"
+              onClick={() => pickTool("select")}
+              aria-label="Close catalogue"
+              className="absolute right-2 top-2 z-10 rounded-lg p-1 text-ink-dim transition hover:bg-white hover:text-azure md:hidden"
+            >
+              <X className="h-4 w-4" />
+            </button>
             <CatalogPanel
               selectedId={pendingCatalogId}
               onPick={setPendingCatalogId}
@@ -441,7 +458,7 @@ export function PropertyStudio() {
 
         {/* Inspector */}
         {inspectorOpen && (
-          <aside className="hidden w-72 flex-shrink-0 overflow-y-auto border-l border-line bg-panel md:block">
+          <aside className="absolute inset-x-0 bottom-0 z-30 max-h-[46%] overflow-y-auto border-t border-line bg-panel-raised backdrop-blur-xl shadow-2xl md:static md:z-auto md:max-h-none md:w-72 md:flex-shrink-0 md:border-l md:border-t-0 md:bg-panel md:shadow-none">
             <Inspector
               plan={plan}
               rooms={rooms}

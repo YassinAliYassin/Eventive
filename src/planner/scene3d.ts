@@ -13,7 +13,7 @@ import { PointerLockControls } from "three/examples/jsm/controls/PointerLockCont
 import { catalogEntry } from "./catalog";
 import { cornerMap, openingSpan, radians, wallEnds } from "./geometry";
 import type { Room } from "./geometry";
-import type { Plan, Selection, Wall } from "./types";
+import type { Corner, Plan, Selection, Wall } from "./types";
 import { buildItemMesh } from "./items3d";
 
 export type WallMode = "full" | "low" | "none";
@@ -37,6 +37,8 @@ export interface SceneCallbacks {
 
 const WALK_HEIGHT = 1.65;
 const WALK_SPEED = 3.4;
+/** Body radius used to keep the walkthrough camera out of the walls. */
+const WALK_RADIUS = 0.28;
 
 export class PropertyScene {
   private readonly canvas: HTMLCanvasElement;
@@ -71,6 +73,7 @@ export class PropertyScene {
   private selection: Selection | null = null;
   private structureKey = "";
   private furnitureKey = "";
+  private barriers: Barrier[] = [];
 
   private drag: { id: string; offset: THREE.Vector3; altKey: boolean } | null = null;
   private readonly keys = new Set<string>();
@@ -237,10 +240,12 @@ export class PropertyScene {
   /** Frames the whole property, from a three-quarter view. */
   fit(): void {
     if (!this.plan) return;
+    // Frame the building. Furniture only defines the view when nothing is
+    // built, so outdoor props do not shrink the subject.
     const box = new THREE.Box3();
     box.setFromObject(this.structure);
-    if (this.options.showFurniture && this.furniture.children.length > 0) {
-      box.union(new THREE.Box3().setFromObject(this.furniture));
+    if (box.isEmpty() && this.furniture.children.length > 0) {
+      box.setFromObject(this.furniture);
     }
     if (box.isEmpty()) box.set(new THREE.Vector3(-5, 0, -5), new THREE.Vector3(5, 3, 5));
 
@@ -319,6 +324,10 @@ export class PropertyScene {
         if (group) this.structure.add(group);
       }
     }
+
+    // Collision uses the real walls, not the drawn ones, so the walkthrough
+    // behaves the same in dollhouse mode as at full height.
+    this.barriers = plan.walls.flatMap((wall) => wallBarriers(wall, corners));
   }
 
   private rebuildFurniture(): void {
@@ -456,6 +465,89 @@ export class PropertyScene {
     this.keys.delete(event.code);
   };
 
+  /**
+   * Keeps the walkthrough camera out of the walls.
+   *
+   * Three rules, cheapest first: push out of any barrier the walker is inside
+   * or has crossed (this is also what makes sliding along a wall feel right);
+   * push off the end caps, which covers corners; and finally, if the movement
+   * itself still crosses a barrier, stop dead. That last rule is the backstop
+   * for a long frame — at 3.4 m/s a stutter can otherwise step clean through a
+   * 0.2 m wall, and the diagonal through a corner escapes the other two.
+   *
+   * Two passes settle the common case of walking into a corner, where pushing
+   * out of one wall pushes you into the other.
+   */
+  private resolveCollisions(previous: THREE.Vector3): void {
+    if (this.barriers.length === 0) return;
+    const position = this.camera.position;
+
+    for (let pass = 0; pass < 2; pass += 1) {
+      let moved = false;
+      for (const barrier of this.barriers) {
+        const abx = barrier.bx - barrier.ax;
+        const abz = barrier.bz - barrier.az;
+        const lengthSquared = abx * abx + abz * abz;
+        if (lengthSquared < 1e-9) continue;
+
+        const clearance = barrier.radius + WALK_RADIUS;
+        const length = Math.sqrt(lengthSquared);
+        const nx = -abz / length;
+        const nz = abx / length;
+        const sideBefore = (previous.x - barrier.ax) * nx + (previous.z - barrier.az) * nz;
+        const sideNow = (position.x - barrier.ax) * nx + (position.z - barrier.az) * nz;
+        const along =
+          ((position.x - barrier.ax) * abx + (position.z - barrier.az) * abz) / lengthSquared;
+
+        // Inside the wall's span: hold the walker a clearance off the face it
+        // approached from, keeping its position along the wall so it slides.
+        if (along >= 0 && along <= 1 && Math.abs(sideBefore) > 1e-6) {
+          const crossed = Math.sign(sideNow) !== Math.sign(sideBefore);
+          if (crossed || Math.abs(sideNow) < clearance) {
+            const side = sideBefore > 0 ? 1 : -1;
+            position.x = barrier.ax + abx * along + nx * clearance * side;
+            position.z = barrier.az + abz * along + nz * clearance * side;
+            moved = true;
+            continue;
+          }
+        }
+
+        // Backstop: did the movement pass straight through this barrier?
+        const mx = position.x - previous.x;
+        const mz = position.z - previous.z;
+        const denominator = mx * abz - mz * abx;
+        if (Math.abs(denominator) > 1e-9) {
+          const u = ((barrier.ax - previous.x) * abz - (barrier.az - previous.z) * abx) / denominator;
+          const v = ((barrier.ax - previous.x) * mz - (barrier.az - previous.z) * mx) / denominator;
+          if (u >= 0 && u <= 1 && v >= 0 && v <= 1) {
+            position.x = previous.x;
+            position.z = previous.z;
+            moved = true;
+            continue;
+          }
+        }
+
+        // End caps, which is what stops you cutting a corner.
+        const t = Math.max(0, Math.min(1, along));
+        const closestX = barrier.ax + abx * t;
+        const closestZ = barrier.az + abz * t;
+        let dx = position.x - closestX;
+        let dz = position.z - closestZ;
+        let distance = Math.hypot(dx, dz);
+        if (distance >= clearance) continue;
+        if (distance < 1e-6) {
+          dx = previous.x - closestX;
+          dz = previous.z - closestZ;
+          distance = Math.hypot(dx, dz) || 1;
+        }
+        position.x = closestX + (dx / distance) * clearance;
+        position.z = closestZ + (dz / distance) * clearance;
+        moved = true;
+      }
+      if (!moved) break;
+    }
+  }
+
   /* ---------------- loop ---------------- */
 
   private tick = () => {
@@ -476,8 +568,10 @@ export class PropertyScene {
       this.velocity.z -= forward * WALK_SPEED * boost * 10 * delta;
       this.velocity.x -= strafe * WALK_SPEED * boost * 10 * delta;
 
+      const before = this.camera.position.clone();
       this.pointerLock.moveRight(-this.velocity.x * delta);
       this.pointerLock.moveForward(-this.velocity.z * delta);
+      this.resolveCollisions(before);
       this.camera.position.y = WALK_HEIGHT;
     } else {
       this.orbit.update();
@@ -640,6 +734,56 @@ function buildFloor(room: Room, color?: string): THREE.Mesh {
 /* ------------------------------------------------------------------ *
  * Utilities
  * ------------------------------------------------------------------ */
+
+/** A solid stretch of wall the walkthrough camera cannot pass through. */
+interface Barrier {
+  ax: number;
+  az: number;
+  bx: number;
+  bz: number;
+  radius: number;
+}
+
+/**
+ * The blocking parts of a wall: every run that is not a doorway. Windows and
+ * high-silled openings still block — you can see through them, not walk
+ * through them — while doors and arches leave a real gap to walk into.
+ */
+function wallBarriers(wall: Wall, corners: Map<string, Corner>): Barrier[] {
+  const ends = wallEnds(wall, corners);
+  if (!ends) return [];
+  const length = Math.hypot(ends.b.x - ends.a.x, ends.b.y - ends.a.y);
+  if (length < 0.01) return [];
+
+  const dirX = (ends.b.x - ends.a.x) / length;
+  const dirZ = (ends.b.y - ends.a.y) / length;
+  const radius = wall.thickness / 2;
+
+  const walkThrough = wall.openings
+    .filter((opening) => opening.sill <= 0.1 && opening.height >= 1.6)
+    .map((opening) => openingSpan(opening, length))
+    .sort((a, b) => a.start - b.start);
+
+  const barriers: Barrier[] = [];
+  const push = (from: number, to: number) => {
+    if (to - from < 0.02) return;
+    barriers.push({
+      ax: ends.a.x + dirX * from,
+      az: ends.a.y + dirZ * from,
+      bx: ends.a.x + dirX * to,
+      bz: ends.a.y + dirZ * to,
+      radius,
+    });
+  };
+
+  let cursor = 0;
+  for (const gap of walkThrough) {
+    push(cursor, gap.start);
+    cursor = Math.max(cursor, gap.end);
+  }
+  push(cursor, length);
+  return barriers;
+}
 
 /** Everything that changes the extruded shell: corners, walls, floors. */
 function structureSignature(plan: Plan, rooms: Room[]): string {

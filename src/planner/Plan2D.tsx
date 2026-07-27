@@ -104,17 +104,23 @@ export function Plan2D(props: Plan2DProps) {
     return () => observer.disconnect();
   }, []);
 
+  // Fit to the building, not to every prop: a tree parked 15 m away should not
+  // shrink the house to a third of the pane. Items only set the bounds when
+  // there is nothing built yet.
   const bounds = useMemo(() => {
     const xs: number[] = [];
     const ys: number[] = [];
-    for (const c of plan.corners) {
-      xs.push(c.x);
-      ys.push(c.y);
-    }
-    for (const i of plan.items) {
-      const reach = Math.max(i.width, i.depth) / 2;
-      xs.push(i.x - reach, i.x + reach);
-      ys.push(i.y - reach, i.y + reach);
+    if (plan.corners.length > 0) {
+      for (const c of plan.corners) {
+        xs.push(c.x);
+        ys.push(c.y);
+      }
+    } else {
+      for (const i of plan.items) {
+        const reach = Math.max(i.width, i.depth) / 2;
+        xs.push(i.x - reach, i.x + reach);
+        ys.push(i.y - reach, i.y + reach);
+      }
     }
     if (xs.length === 0) return { minX: 0, minY: 0, maxX: 10, maxY: 8 };
     return {
