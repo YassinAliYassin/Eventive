@@ -21,7 +21,7 @@ app.use(cors({
   credentials: true
 }));
 
-app.get("/api/health", (req: Request, res: Response) => {
+app.get("/api/health", (_req: Request, res: Response) => {
   res.json({
     status: "healthy",
     timestamp: new Date().toISOString(),
@@ -32,7 +32,7 @@ app.get("/api/health", (req: Request, res: Response) => {
 const distPath = path.join(process.cwd(), "dist");
 if (fs.existsSync(distPath)) {
   app.use(express.static(distPath));
-  app.get("*", (req: Request, res: Response) => {
+  app.get("*", (_req: Request, res: Response) => {
     res.sendFile(path.join(distPath, "index.html"));
   });
 }
