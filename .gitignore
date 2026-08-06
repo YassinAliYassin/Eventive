@@ -14,3 +14,4 @@ pm2_out
 .claude
 .worktrees
 .vite
+/data

@@ -20,6 +20,9 @@ layer so content is easy to edit without touching markup.
 - **Contact** — contact section with form handling.
 - **Accessibility** — WCAG-AA legibility baked into the design system.
 - **Animations** — scroll-reveal hooks and motion flourishes.
+- **Staff Time Sheet** (`/timesheet`) — staff sign in/out on-site by picking their
+  work location, with hours tracked into 26th–25th pay periods. An admin summary
+  (`/timesheet/admin`) totals hours per staff member per period with CSV export.
 
 ---
 
@@ -110,6 +113,7 @@ Server-side configuration is read from environment variables (see `server.ts`):
 | --- | --- |
 | `GEMINI_API_KEY` | (Optional) Google Gemini API key for AI features. |
 | `PORT` | Server port for production (`npm start`). |
+| `TIMESHEET_ADMIN_KEY` | Shared secret required to view `/timesheet/admin`. Falls back to an insecure default with a console warning — always set this in production. |
 
 Copy `.env.example`-style values into a local `.env` (gitignored) as needed. See
 `DEPLOY`/`.env.example` files in the repo for the current set.
@@ -132,6 +136,26 @@ NODE_ENV=production PORT=3000 npm start
 
 ---
 
+## Staff Time Sheet
+
+Staff sign in and out on-site from `/timesheet`, picking their name, a 4-digit
+PIN, and the venue/location they're working at. Hours are tallied into pay
+periods that run the **26th of one month through the 25th of the next**
+(see `src/lib/payPeriod.ts`), not calendar months.
+
+- The staff roster (names, roles, PINs) is seeded server-side from
+  `server/timesheetSeed.ts` — edit it and restart the server to add/remove
+  staff. PINs are hashed (scrypt) before being written to `data/timesheet.json`,
+  which also stores every clock-in/out entry; that file is gitignored and
+  persists on disk between server restarts.
+- `/timesheet/admin` shows total hours per staff member for a selected pay
+  period, with CSV export, gated behind the `TIMESHEET_ADMIN_KEY` shared
+  secret (see Configuration below).
+- API routes live under `/api/timesheet/*` (`server/timesheetRoutes.ts`),
+  backed by `server/timesheetStore.ts`.
+
+---
+
 ## Folder structure
 
 ```
@@ -139,10 +163,14 @@ eventive/
 ├── src/
 │   ├── main.tsx / App.tsx
 │   ├── index.css
-│   ├── data/            # venues.ts, manifests.ts (content layer)
+│   ├── data/            # venues.ts, manifests.ts, workLocations.ts (content layer)
 │   ├── hooks/           # useReveal.ts
+│   ├── lib/             # payPeriod.ts, timesheetApi.ts
+│   ├── types/           # timesheet.ts
+│   ├── pages/           # Home, Timesheet, TimesheetAdmin
 │   └── components/
 │       └── marketing/   # Hero, Venues, Services, About, Manifest, Contact, Header, Footer
+├── server/               # timesheetSeed.ts, timesheetStore.ts, timesheetRoutes.ts
 ├── server.ts             # Express + Vite entry
 ├── vite.config.ts / tsconfig.json
 ├── .eslintrc.cjs
