@@ -1,4 +1,5 @@
 import fs from "fs";
+import os from "os";
 import path from "path";
 import crypto from "crypto";
 import { STAFF_SEED } from "./timesheetSeed";
@@ -33,7 +34,23 @@ interface Store {
   entries: StoredEntry[];
 }
 
-const DATA_DIR = path.join(process.cwd(), "data");
+// Prefer a project-local data dir (persists across restarts on a normal
+// server); fall back to the OS tmp dir on read-only filesystems such as
+// serverless runtimes, where writes outside /tmp throw EROFS/EACCES.
+function resolveDataDir(): string {
+  const primary = path.join(process.cwd(), "data");
+  try {
+    fs.mkdirSync(primary, { recursive: true });
+    fs.accessSync(primary, fs.constants.W_OK);
+    return primary;
+  } catch {
+    const fallback = path.join(os.tmpdir(), "eventive-timesheet-data");
+    fs.mkdirSync(fallback, { recursive: true });
+    return fallback;
+  }
+}
+
+const DATA_DIR = resolveDataDir();
 const DATA_FILE = path.join(DATA_DIR, "timesheet.json");
 
 function hashPin(pin: string, salt: string): string {
