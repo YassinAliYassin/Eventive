@@ -1,3 +1,5 @@
+import { Link } from "react-router-dom";
+
 export function Footer() {
   return (
     <footer className="relative z-[1] px-4 pb-6">
@@ -52,8 +54,11 @@ export function Footer() {
           </div>
         </div>
 
-        <div className="pt-6 font-mono text-[10px] text-ink-dim tracking-[0.05em] text-center md:text-left">
-          &copy; {new Date().getFullYear()} Eventive. All rights reserved.
+        <div className="pt-6 font-mono text-[10px] text-ink-dim tracking-[0.05em] flex flex-col md:flex-row items-center md:items-baseline justify-between gap-2 text-center md:text-left">
+          <span>&copy; {new Date().getFullYear()} Eventive. All rights reserved.</span>
+          <Link to="/timesheet" className="hover:text-azure transition-colors">
+            Staff Sign In
+          </Link>
         </div>
       </div>
     </footer>
